@@ -6,6 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 import SreachScreen from '../screens/Search/SreachScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import ForumScreen from '../screens/Forum/ForumScreen';
+import CalendarScreen from '../screens/Calendar/CalendarScreen';
+import AnalyticScreeen from '../screens/Analytic/AnalyticScreen';
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
 export default function TabNavigator() {
@@ -23,7 +25,13 @@ export default function TabNavigator() {
             iconName = focused ? 'person' : 'person-outline';
           } else if (route.name == "Forum") {
             iconName = focused ? 'chatbox' : "chatbox-outline";
+          } else if (route.name == 'Calendar') {
+            iconName = focused ? 'calendar' : 'calendar-outline';
           }
+          else if (route.name == 'Analytic') {
+            iconName = focused ? 'analytic' : 'analytic-outline';
+          }
+
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -32,8 +40,10 @@ export default function TabNavigator() {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Calendar" component={CalendarScreen} />
       <Tab.Screen name="Search" component={SreachScreen} />
       <Tab.Screen name="Forum" component={ForumScreen} />
+      <Tab.Screen name="Analytic" component={AnalyticScreeen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );

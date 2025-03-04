@@ -9,4 +9,6 @@ export type BottomTabParamList = {
   Search: undefined;
   Profile: undefined;
   Forum: undefined;
+  Calendar: undefined,
+  Analytic: undefined
 };
