@@ -1,61 +1,135 @@
-import { View, Text, Button, Image, TouchableOpacity, Alert } from "react-native";
-import React, { useEffect, useState } from "react";
-import { LoginScreenNavigationProp } from "@/app/router/StackNavigator";
-import FormFiled from "./Components/FormFiled";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView } from "react-native-gesture-handler";
-import CustomButton from "./Components/CustomButton";
-type Props = {
-  navigation: LoginScreenNavigationProp;
-};
-const LoginScreen = ({ navigation }: Props) => {
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-  const handleLogin = async () => {
+import React, {useState} from 'react';
+import {
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    Image,
+    Alert,
+} from 'react-native';
+import {useNavigation, NavigationProp} from '@react-navigation/native';
+import {RootStackParamList} from './LoginScreen/types';
+import styles from './LoginScreen/styles';
+import {auth} from '@/firebase_config.env'; // Import auth từ firebase config
+import {signInWithEmailAndPassword} from 'firebase/auth';
 
-    //logic 
-    if (!(form.email && form.password)) {
-      Alert.alert("Dien day du vao!");
-      return;
-    }
+const LoginScreen: React.FC = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-    navigation.navigate('Tabs');
+    const handleLogin = async () => {
+        // Validation cơ bản
+        if (!email || !password) {
+            console.log('Validation failed: Missing email or password');
+            Alert.alert('Lỗi', 'Vui lòng điền đầy đủ email và mật khẩu');
+            return;
+        }
 
-  };
-  return (
-    <SafeAreaView className="bg-[#D8D2C2] h-full justify-center item-center">
-      <ScrollView className="w-full">
-        <View className="w-full justify-center h-full px-4 my-6">
-          <Text className="text-2xl text-[#543310]  font-semibold">
-            Login
-          </Text>
-          <FormFiled
-            title="Email"
-            value={form.email}
-            placeholder="Hãy nhập email của bạn"
-            handleChangeText={(e) => setForm({ ...form, email: e })}
-          />
-          <FormFiled
-            title="Password"
-            value={form.password}
-            placeholder="Hãy nhập mật khẩu của bạn"
-            handleChangeText={(e) => setForm({ ...form, password: e })}
-          />
-          <CustomButton title="Login" handleSubmit={handleLogin}></CustomButton>
-          <View className="flex-row justify-center w-full px-4 my-2 mt-5">
-            <Text className="px-2 font-semibold text-[#854836]" >nếu bạn chưa có tài khoản?</Text>
-            <TouchableOpacity onPress={() => {
-              navigation.navigate('Register', { itemId: 1, otherParam: "dangkingay" })
-            }}>
-              <Text className="font-semibold text-[#543310]">Đăng kí ngay</Text>
+        setLoading(true);
+
+        try {
+            // Đăng nhập với Firebase
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            console.log('Đăng nhập thành công cho email:', email);
+            Alert.alert('Thành công', 'Đăng nhập thành công!');
+            // Điều hướng đến màn hình chính sau khi đăng nhập (ví dụ: 'Home')
+            // navigation.navigate('Home'); // Uncomment và thay 'Home' bằng route của bạn
+
+        } catch (error: any) {
+            console.error('Lỗi đăng nhập:', error.message);
+            switch (error.code) {
+                case 'auth/invalid-email':
+                    Alert.alert('Lỗi', 'Email không hợp lệ');
+                    break;
+                case 'auth/user-not-found':
+                    Alert.alert('Lỗi', 'Không tìm thấy người dùng với email này');
+                    break;
+                case 'auth/wrong-password':
+                    Alert.alert('Lỗi', 'Mật khẩu không đúng');
+                    break;
+                case 'auth/too-many-requests':
+                    Alert.alert('Lỗi', 'Quá nhiều yêu cầu, vui lòng thử lại sau');
+                    break;
+                default:
+                    Alert.alert('Lỗi', 'Đã có lỗi xảy ra: ' + error.message);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <View style={styles.container}>
+            {/* Welcome Text */}
+            <Text style={styles.welcomeText}>Chào mừng trở lại!</Text>
+            <Text style={styles.subText}>Chào mừng trở lại bạn đã bỏ lỡ!</Text>
+
+            {/* Email Input */}
+            <TextInput
+                style={styles.input}
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+            />
+
+            {/* Password Input */}
+            <View style={styles.passwordContainer}>
+                <TextInput
+                    style={styles.passwordInput}
+                    placeholder="Mật Khẩu"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={true}
+                />
+                <Text style={styles.forgotPassword}>Quên Mật Khẩu?</Text>
+            </View>
+
+            {/* Login Button */}
+            <TouchableOpacity
+                style={[styles.loginButton, loading && styles.loginButtonDisabled]}
+                onPress={handleLogin}
+                disabled={loading}
+            >
+                <Text style={styles.loginButtonText}>
+                    {loading ? 'Đang đăng nhập...' : 'Đăng Nhập'}
+                </Text>
             </TouchableOpacity>
-          </View>
+
+            {/* Social Login Options */}
+            <Text style={styles.orText}>Hoặc tiếp tục với</Text>
+
+            <View style={styles.socialButtons}>
+                <TouchableOpacity style={styles.socialButton}>
+                    <Image
+                        source={require('@/assets/images/icon/google.png')}
+                        style={styles.socialIcon}
+                    />
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.socialButton}>
+                    <Image
+                        source={require('@/assets/images/icon/facebook.png')}
+                        style={styles.socialIcon}
+                    />
+                </TouchableOpacity>
+            </View>
+
+            {/* Sign Up Link */}
+            <Text style={styles.signUpText}>
+                Không có tài khoản?{' '}
+                <Text
+                    style={styles.signUpLink}
+                    onPress={() => navigation.navigate('SignUp')}
+                >
+                    Đăng ký ngay
+                </Text>
+            </Text>
         </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+    );
 };
 
 export default LoginScreen;

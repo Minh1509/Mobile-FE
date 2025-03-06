@@ -1,0 +1,107 @@
+﻿import { StyleSheet } from 'react-native';
+
+export default StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        padding: 20,
+        justifyContent: 'center',
+    },
+    welcomeText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#000',
+        textAlign: 'center',
+        marginBottom: 5,
+    },
+    subText: {
+        fontSize: 14,
+        color: '#666',
+        textAlign: 'center',
+        marginBottom: 30,
+    },
+    input: {
+        height: 50,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        paddingHorizontal: 15,
+        marginBottom: 15,
+        fontSize: 16,
+        backgroundColor: '#f9f9f9',
+    },
+    passwordContainer: {
+        width: '100%',
+        marginBottom: 15,
+    },
+    passwordInput: {
+        height: 50,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        paddingHorizontal: 15,
+        fontSize: 16,
+        backgroundColor: '#f9f9f9',
+    },
+    forgotPassword: {
+        color: '#007AFF',
+        fontSize: 14,
+        textAlign: 'right',
+        marginTop: 5,
+    },
+    loginButton: {
+        backgroundColor: '#FF3B30',
+        height: 50,
+        borderRadius: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    loginButtonDisabled: {
+        backgroundColor: '#FF6B61',
+        opacity: 0.7,
+    },
+    loginButtonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    orText: {
+        textAlign: 'center',
+        color: '#666',
+        fontSize: 14,
+        marginVertical: 15,
+    },
+    socialButtons: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 20,
+    },
+    socialButton: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f9f9f9',
+        marginHorizontal: 10,
+    },
+    socialIcon: {
+        width: 30,
+        height: 30,
+    },
+    signUpText: {
+        textAlign: 'center',
+        color: '#666',
+        fontSize: 14,
+    },
+    signUpLink: {
+        color: '#007AFF',
+        fontWeight: 'bold',
+    },
+});
