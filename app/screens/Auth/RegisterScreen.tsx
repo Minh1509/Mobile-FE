@@ -109,7 +109,7 @@ const SignUpScreen: React.FC = () => {
               onPress={() => setGender('Nam')}
           >
             <Image
-                source={require('../../../../assets/images/icon/man.png')}
+                source={require('@/assets/images/icon/man.png')}
                 style={styles.genderIcon}
             />
             <Text style={styles.genderText}>Nam</Text>
@@ -122,7 +122,7 @@ const SignUpScreen: React.FC = () => {
               onPress={() => setGender('Nữ')}
           >
             <Image
-                source={require('../../../../assets/images/icon/woman.png')}
+                source={require('@/assets/images/icon/woman.png')}
                 style={styles.genderIcon}
             />
             <Text style={styles.genderText}>Nữ</Text>
