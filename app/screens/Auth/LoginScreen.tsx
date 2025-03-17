@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -7,11 +7,11 @@ import {
     Image,
     Alert,
 } from 'react-native';
-import {useNavigation, NavigationProp} from '@react-navigation/native';
-import {RootStackParamList} from './LoginScreen/types';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from './LoginScreen/types';
 import styles from './LoginScreen/styles';
-import {auth} from '@/firebase_config.env'; // Import auth từ firebase config
-import {signInWithEmailAndPassword} from 'firebase/auth';
+import { auth } from '@/firebase_config.env'; // Import auth từ firebase config
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const LoginScreen: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -36,6 +36,7 @@ const LoginScreen: React.FC = () => {
             Alert.alert('Thành công', 'Đăng nhập thành công!');
             // Điều hướng đến màn hình chính sau khi đăng nhập (ví dụ: 'Home')
             // navigation.navigate('Home'); // Uncomment và thay 'Home' bằng route của bạn
+            navigation.navigate('Tabs');
 
         } catch (error: any) {
             console.error('Lỗi đăng nhập:', error.message);

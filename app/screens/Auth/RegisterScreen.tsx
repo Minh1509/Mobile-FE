@@ -40,9 +40,9 @@ const SignUpScreen: React.FC = () => {
     try {
       // Tạo tài khoản với email và password
       const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
+        auth,
+        email,
+        password
       );
 
       // Cập nhật profile với fullName
@@ -79,100 +79,100 @@ const SignUpScreen: React.FC = () => {
   };
 
   return (
-      <View style={styles.container}>
-        <Text style={styles.welcomeText}>Chào người dùng mới!</Text>
-        <Text style={styles.subText}>Chào mừng bạn đến với ứng dụng</Text>
+    <View style={styles.container}>
+      <Text style={styles.welcomeText}>Chào người dùng mới!</Text>
+      <Text style={styles.subText}>Chào mừng bạn đến với ứng dụng</Text>
 
-        <TextInput
-            style={styles.input}
-            placeholder="Họ Tên"
-            value={fullName}
-            onChangeText={setFullName}
-            autoCapitalize="words"
-        />
+      <TextInput
+        style={styles.input}
+        placeholder="Họ Tên"
+        value={fullName}
+        onChangeText={setFullName}
+        autoCapitalize="words"
+      />
 
-        <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-        />
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
 
-        <View style={styles.genderContainer}>
-          <TouchableOpacity
-              style={[
-                styles.genderButton,
-                gender === 'Nam' && styles.genderButtonSelected,
-              ]}
-              onPress={() => setGender('Nam')}
-          >
-            <Image
-                source={require('@/assets/images/icon/man.png')}
-                style={styles.genderIcon}
-            />
-            <Text style={styles.genderText}>Nam</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-              style={[
-                styles.genderButton,
-                gender === 'Nữ' && styles.genderButtonSelected,
-              ]}
-              onPress={() => setGender('Nữ')}
-          >
-            <Image
-                source={require('@/assets/images/icon/woman.png')}
-                style={styles.genderIcon}
-            />
-            <Text style={styles.genderText}>Nữ</Text>
-          </TouchableOpacity>
-        </View>
-
-        <TextInput
-            style={styles.input}
-            placeholder="Ngày sinh"
-            value={birthDate}
-            onChangeText={setBirthDate}
-            keyboardType="numeric"
-        />
-
-        <TextInput
-            style={styles.input}
-            placeholder="Mật Khẩu"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={true}
-        />
-
-        <TextInput
-            style={styles.input}
-            placeholder="Xác nhận mật khẩu"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry={true}
-        />
-
+      <View style={styles.genderContainer}>
         <TouchableOpacity
-            style={[styles.signUpButton, loading && styles.signUpButtonDisabled]}
-            onPress={handleSignUp}
-            disabled={loading}
+          style={[
+            styles.genderButton,
+            gender === 'Nam' && styles.genderButtonSelected,
+          ]}
+          onPress={() => setGender('Nam')}
         >
-          <Text style={styles.signUpButtonText}>
-            {loading ? 'Đang xử lý...' : 'Đăng ký'}
-          </Text>
+          <Image
+            source={require('@/assets/images/icon/man.png')}
+            style={styles.genderIcon}
+          />
+          <Text style={styles.genderText}>Nam</Text>
         </TouchableOpacity>
-
-        <Text style={styles.loginText}>
-          Đã có tài khoản?{' '}
-          <Text
-              style={styles.loginLink}
-              onPress={() => navigation.navigate('Login')}
-          >
-            Đăng nhập ngay
-          </Text>
-        </Text>
+        <TouchableOpacity
+          style={[
+            styles.genderButton,
+            gender === 'Nữ' && styles.genderButtonSelected,
+          ]}
+          onPress={() => setGender('Nữ')}
+        >
+          <Image
+            source={require('@/assets/images/icon/woman.png')}
+            style={styles.genderIcon}
+          />
+          <Text style={styles.genderText}>Nữ</Text>
+        </TouchableOpacity>
       </View>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Ngày sinh"
+        value={birthDate}
+        onChangeText={setBirthDate}
+        keyboardType="numeric"
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Mật Khẩu"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry={true}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Xác nhận mật khẩu"
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        secureTextEntry={true}
+      />
+
+      <TouchableOpacity
+        style={[styles.signUpButton, loading && styles.signUpButtonDisabled]}
+        onPress={handleSignUp}
+        disabled={loading}
+      >
+        <Text style={styles.signUpButtonText}>
+          {loading ? 'Đang xử lý...' : 'Đăng ký'}
+        </Text>
+      </TouchableOpacity>
+
+      <Text style={styles.loginText}>
+        Đã có tài khoản?{' '}
+        <Text
+          style={styles.loginLink}
+          onPress={() => navigation.navigate('Login')}
+        >
+          Đăng nhập ngay
+        </Text>
+      </Text>
+    </View>
   );
 };
 
