@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Calendar } from "react-native-calendars";
-import { SetStateAction, useState } from "react";
+import { useState } from "react";
+import CalendarComponent from "@/app/Components/CalendarComponent";
 
 const transactions = [
     { id: 1, title: "Di chuyển", amount: "-50.000 VND", icon: "https://source.unsplash.com/40x40/?car", color: "text-red-500" },
@@ -16,60 +16,17 @@ export default function CalendarScreen() {
     const [month, setMonth] = useState(currentDate.getMonth() + 1);
     const [year, setYear] = useState(currentDate.getFullYear());
 
-    // Format today's date for marking
-    const today = currentDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-
-    // Prepare markedDates object with both selected date and today
-    const markedDates = {
-        [selectedDate]: { selected: true, selectedColor: "green" },
-        [today]: {
-            selected: true,
-            selectedColor: "red",
-            marked: true,
-            dotColor: "white"
-        }
-    };
-
-    // If selected date is today, merge the styles
-    if (selectedDate === today) {
-        markedDates[today] = {
-            ...markedDates[today],
-            selected: true,
-            selectedColor: "red"
-        };
-    }
-
     return (
         <View className="flex-1 bg-gray-100">
-            {/* Header */}
-            <View className="flex-row items-center justify-between px-4 py-3 bg-green-300">
-                <TouchableOpacity onPress={() => setMonth(month === 1 ? 12 : month - 1)}>
-                    {/* <Ionicons name="chevron-back" size={24} color="black" /> */}
-                </TouchableOpacity>
-                <Text className="text-lg font-bold">{`Tháng ${month} năm ${year}`}</Text>
-                <TouchableOpacity onPress={() => setMonth(month === 12 ? 1 : month + 1)}>
-                    {/* <Ionicons name="chevron-forward" size={24} color="black" /> */}
-                </TouchableOpacity>
-            </View>
-
-            {/* Calendar */}
-            <View className="m-4 rounded-lg shadow bg-white p-4">
-                <Calendar
-                    current={`${year}-${month < 10 ? `0${month}` : month}-01`}
-                    onDayPress={(day: { dateString: SetStateAction<string>; }) => setSelectedDate(day.dateString)}
-                    markedDates={markedDates}
-                    theme={{
-                        selectedDayBackgroundColor: "green",
-                        todayTextColor: "red",
-                        arrowColor: "green",
-                        todayBackgroundColor: "#ffeeee", // Light red background for today
-                    }}
-                    onMonthChange={(monthData: { month: SetStateAction<number>; year: SetStateAction<number>; }) => {
-                        setMonth(monthData.month);
-                        setYear(monthData.year);
-                    }}
-                />
-            </View>
+            {/* Calendar Component */}
+            <CalendarComponent
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                month={month}
+                setMonth={setMonth}
+                year={year}
+                setYear={setYear}
+            />
 
             {/* Summary */}
             <View className="flex-row justify-between bg-white mx-4 p-4 rounded-lg shadow">
