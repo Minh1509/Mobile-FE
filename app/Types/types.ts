@@ -1,7 +1,10 @@
+import { ITransaction } from "../interface/Transaction";
+
 export type RootStackParamList = {
   Tabs: undefined;
   Login: undefined;
-  Register: undefined
+  Register: undefined;
+  TransactionDetail: { transaction: ITransaction };
 };
 
 export type BottomTabParamList = {

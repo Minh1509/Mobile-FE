@@ -8,6 +8,7 @@ import TabNavigator from "./TabNavigator";
 import { RootStackParamList } from "../Types/types";
 import LoginScreen from "../screens/Auth/LoginScreen/LoginScreen";
 import RegisterScreen from "../screens/Auth/RegisterScreen/RegisterScreen";
+import TransactionDetailScreen from "../screens/TransactionDetailScreen/TransactionDetailScreen";
 const Stack = createStackNavigator<RootStackParamList>();
 
 export type LoginScreenNavigationProp = StackNavigationProp<
@@ -32,6 +33,8 @@ export default function StackNavigator() {
       />
       <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="TransactionDetail" component={TransactionDetailScreen} options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }
