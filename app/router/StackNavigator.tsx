@@ -6,8 +6,8 @@ import {
 import { RouteProp } from "@react-navigation/native";
 import TabNavigator from "./TabNavigator";
 import { RootStackParamList } from "../Types/types";
-import LoginScreen from "../screens/Auth/LoginScreen";
-import RegisterScreen from "../screens/Auth/RegisterScreen";
+import LoginScreen from "../screens/Auth/LoginScreen/LoginScreen";
+import RegisterScreen from "../screens/Auth/RegisterScreen/RegisterScreen";
 const Stack = createStackNavigator<RootStackParamList>();
 
 export type LoginScreenNavigationProp = StackNavigationProp<
@@ -30,8 +30,8 @@ export default function StackNavigator() {
         component={TabNavigator}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="Login" component={LoginScreen} options={{headerShown: false}}/>
-      <Stack.Screen name="Register" component={RegisterScreen} options={{headerShown: false}} />
+      <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }

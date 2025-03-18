@@ -8,8 +8,8 @@ import {
   Alert,
 } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { RootStackParamList } from '@/app/screens/Auth/LoginScreen/types';
-import styles from './RegisterScreen/styles';
+import { RootStackParamList } from "../../../Types/types";
+import styles from './styles';
 import { auth } from '@/firebase_config.env'; // Import auth từ firebase config
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 

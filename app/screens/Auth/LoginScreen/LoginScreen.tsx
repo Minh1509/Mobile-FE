@@ -8,8 +8,8 @@ import {
     Alert,
 } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { RootStackParamList } from './LoginScreen/types';
-import styles from './LoginScreen/styles';
+import { RootStackParamList } from "../../../Types/types";
+import styles from './styles';
 import { auth } from '@/firebase_config.env'; // Import auth từ firebase config
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
@@ -124,7 +124,7 @@ const LoginScreen: React.FC = () => {
                 Không có tài khoản?{' '}
                 <Text
                     style={styles.signUpLink}
-                    onPress={() => navigation.navigate('SignUp')}
+                    onPress={() => navigation.navigate('Register')}
                 >
                     Đăng ký ngay
                 </Text>
