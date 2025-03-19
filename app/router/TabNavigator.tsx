@@ -9,6 +9,7 @@ import ProfileScreen from "../screens/Profile/ProfileScreen";
 import ForumScreen from "../screens/Forum/ForumScreen";
 import AnalyticScreen from "../screens/Analytic/AnalyticScreen";
 import { useNavigation, StackActions } from "@react-navigation/native";
+import ExpenseScreen from "../screens/Expense/ExpenseScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -59,7 +60,7 @@ export default function TabNavigator() {
       >
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Calendar" component={CalendarScreen} />
-        <Tab.Screen
+        {/* <Tab.Screen
           name="Add"
           component={() => null}
           options={{
@@ -80,35 +81,12 @@ export default function TabNavigator() {
               setModalVisible(true);
             },
           }}
-        />
+        /> */}
+        <Tab.Screen name="AddExpense" component={ExpenseScreen} />
         <Tab.Screen name="Analytic" component={AnalyticScreen} />
         <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
 
-      {/* Modal khi bấm vào nút "+" */}
-      <Modal transparent={true} visible={modalVisible} animationType="slide">
-        <TouchableOpacity
-          className="flex-1 bg-black bg-opacity-50 justify-center items-center"
-          onPress={() => setModalVisible(false)}
-          activeOpacity={1}
-        >
-          <View className="bg-white p-6 rounded-lg w-3/4">
-            <Text className="text-lg font-bold mb-4">Chọn hành động</Text>
-            <TouchableOpacity
-              className="mb-3 p-3 bg-green-400 rounded"
-              onPress={handleAddBudget}
-            >
-              <Text className="text-white text-center">Thêm Ngân Sách</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              className="p-3 bg-red-400 rounded"
-              onPress={handleAddExpense}
-            >
-              <Text className="text-white text-center">Thêm Chi Tiêu</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
     </>
   );
 }
