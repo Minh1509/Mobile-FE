@@ -5,13 +5,14 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   TransactionDetail: { transaction: ITransaction };
+  EditTransaction: { transaction: ITransaction };
+  CategoryTransactions: { category: string, transactions: ITransaction[] };
 };
 
 export type BottomTabParamList = {
   Home: undefined;
   Search: undefined;
   Profile: undefined;
-  Forum: undefined;
   Calendar: undefined,
-  Analytic: undefined
+  Utility: undefined
 };
