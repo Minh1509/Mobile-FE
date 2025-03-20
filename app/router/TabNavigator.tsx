@@ -10,6 +10,7 @@ import ForumScreen from "../screens/Forum/ForumScreen";
 import AnalyticScreen from "../screens/Analytic/AnalyticScreen";
 import { useNavigation, StackActions } from "@react-navigation/native";
 import ExpenseScreen from "../screens/Expense/ExpenseScreen";
+import IncomeScreen from "../screens/Income/IncomeScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -82,7 +83,7 @@ export default function TabNavigator() {
             },
           }}
         /> */}
-        <Tab.Screen name="AddExpense" component={ExpenseScreen} />
+        <Tab.Screen name="AddExpense" component={IncomeScreen} />
         <Tab.Screen name="Analytic" component={AnalyticScreen} />
         <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
