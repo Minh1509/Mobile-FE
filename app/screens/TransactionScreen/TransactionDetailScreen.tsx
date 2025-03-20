@@ -26,7 +26,7 @@ const TransactionSummary = ({
 }: {
     amount: string,
     date: string,
-    categoryIcon: string
+    categoryIcon: keyof typeof Ionicons.glyphMap
 }) => (
     <View className="bg-white rounded-lg p-6 mb-4 shadow items-center">
         <View className="w-16 h-16 bg-gray-200 rounded-full items-center justify-center mb-3">
@@ -89,7 +89,7 @@ const TransactionDetailScreen = () => {
     const route = useRoute<TransactionDetailRouteProp>();
     const { transaction } = route.params;
 
-    const getCategoryIcon = (category: string): string => {
+    const getCategoryIcon = (category: string): keyof typeof Ionicons.glyphMap => {
         switch (category) {
             case "Di chuyển": return "car";
             case "Ăn uống": return "restaurant";

@@ -8,6 +8,7 @@ import SearchBar from '@/app/Components/SearchBar';
 import TransactionItem from '@/app/Components/TransactionItem';
 import EmptyResults from '@/app/Components/EmptyResults';
 import FilterModal from '@/app/Components/FiltalModal';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const transactions = [
   {
@@ -80,7 +81,7 @@ const SearchScreen = () => {
   };
 
   return (
-    <View className='flex-1 bg-gray-100 p-4'>
+    <SafeAreaView className='flex-1 bg-gray-100 p-4'>
       {/* Search bar */}
       <SearchBar
         searchQuery={searchQuery}
@@ -115,7 +116,7 @@ const SearchScreen = () => {
         setSelectedSort={setSelectedSort}
         onReset={resetFilters}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
