@@ -11,6 +11,7 @@ import AnalyticScreen from "../screens/Analytic/AnalyticScreen";
 import { useNavigation, StackActions } from "@react-navigation/native";
 import ExpenseScreen from "../screens/Expense/ExpenseScreen";
 import IncomeScreen from "../screens/Income/IncomeScreen";
+import BudgetScreen from "../screens/Budget/BudgetScreen";
 
 const Tab = createBottomTabNavigator();
 

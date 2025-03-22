@@ -13,16 +13,16 @@ import {
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import ExpenseComponent from "@/app/Components/ExpenseComponent";
 
-const IncomeScreen = () => {
+const BudgetScreen = () => {
   const [money, setMoney] = useState("");
   const [note, setNote] = useState("");
-  const [category, setCategory] = useState("Chọn loại thu nhập");
+  const [category, setCategory] = useState("Chọn loại ngân sách");
   const [date, setDate] = useState(new Date());
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
   const [expanded, setExpanded] = useState(false); // Trạng thái ẩn/hiện
 
-  const categories = ["Lương", "Thưởng", "Đầu tư", "Khác"];
+  const categories = ["Ăn uống", "Mua sắm", "Di chuyển", "Hóa đơn", "Khác"];
 
   const onChangeDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowPicker(false);
@@ -43,7 +43,7 @@ const IncomeScreen = () => {
           <TouchableOpacity onPress={() => {}}>
             <Text className="text-lg">{"<"}</Text>
           </TouchableOpacity>
-          <Text className="text-lg font-bold">Thêm Thu Nhập</Text>
+          <Text className="text-lg font-bold">Thêm Ngân Sách</Text>
           <TouchableOpacity>
             <Text className="text-blue-500 font-bold">Lưu</Text>
           </TouchableOpacity>
@@ -107,7 +107,7 @@ const IncomeScreen = () => {
           />
         )}
 
-        {/* Modal Chọn Loại Thu Nhập */}
+        {/* Modal Chọn Loại Ngân Sách */}
         <Modal
           visible={showCategoryModal}
           transparent={true}
@@ -116,7 +116,7 @@ const IncomeScreen = () => {
         >
           <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
             <View className="bg-white p-5 rounded-lg w-4/5">
-              <Text className="text-lg font-bold">Chọn loại thu nhập</Text>
+              <Text className="text-lg font-bold">Chọn loại ngân sách</Text>
               <FlatList
                 data={categories}
                 keyExtractor={(item) => item}
@@ -140,4 +140,4 @@ const IncomeScreen = () => {
   );
 };
 
-export default IncomeScreen;
+export default BudgetScreen;
