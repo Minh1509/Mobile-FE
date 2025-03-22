@@ -19,14 +19,17 @@ const ExpenseComponentV2: React.FC<ExpenseComponentV2Props> = ({ icon, text, onP
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#f8f9fa",
     padding: 12,
     borderRadius: 10,
     marginVertical: 6,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 1 },  
+    paddingVertical: 10,  
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2, // Hiệu ứng đổ bóng trên Android

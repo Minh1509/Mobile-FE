@@ -8,9 +8,11 @@ import {
   ScrollView,
   Modal,
   FlatList,
-  Platform
+  Platform,
+  StyleSheet,
 } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ExpenseComponent from "@/app/Components/ExpenseComponent";
 
 const BudgetScreen = () => {
@@ -22,7 +24,7 @@ const BudgetScreen = () => {
   const [showPicker, setShowPicker] = useState(false);
   const [expanded, setExpanded] = useState(false); // Trạng thái ẩn/hiện
 
-  const categories = ["Ăn uống", "Mua sắm", "Di chuyển", "Hóa đơn", "Khác"];
+  const categories = ["Lương", "Thưởng", "Đầu tư", "Khác"];
 
   const onChangeDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowPicker(false);
@@ -31,27 +33,23 @@ const BudgetScreen = () => {
     }
   };
 
-  const showDatePicker = () => {
-    setShowPicker(true);
-  };
-
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
-      <ScrollView className="p-4">
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* Header */}
-        <View className="flex-row items-center justify-between">
+        <View style={styles.header}>
           <TouchableOpacity onPress={() => {}}>
-            <Text className="text-lg">{"<"}</Text>
+            <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
           </TouchableOpacity>
-          <Text className="text-lg font-bold">Thêm Ngân Sách</Text>
+          <Text style={styles.headerText}>Thêm ngân sách</Text>
           <TouchableOpacity>
-            <Text className="text-blue-500 font-bold">Lưu</Text>
+            <Text style={styles.saveText}>Lưu</Text>
           </TouchableOpacity>
         </View>
 
         {/* Input số tiền */}
         <TextInput
-          className="bg-white p-4 text-lg rounded-lg my-3"
+          style={styles.input}
           placeholder="Nhập số tiền"
           keyboardType="numeric"
           value={money}
@@ -59,39 +57,32 @@ const BudgetScreen = () => {
         />
 
         {/* Nút ẩn/hiện chi tiết */}
-        <TouchableOpacity
-          className="flex-row justify-between items-center bg-white p-4 rounded-lg my-3"
-          onPress={() => setExpanded(!expanded)}
-        >
-          <Text className="text-base font-bold">Chi tiết</Text>
-          <Text className="text-blue-500">{expanded ? "Ẩn bớt ▲" : "Hiện thêm ▼"}</Text>
+        <TouchableOpacity style={styles.toggleButton} onPress={() => setExpanded(!expanded)}>
+          <Text style={styles.toggleText}>Chi tiết</Text>
+          <MaterialCommunityIcons
+            name={expanded ? "chevron-up" : "chevron-down"}
+            size={20}
+            color="#007bff"
+          />
         </TouchableOpacity>
 
         {/* Phần chi tiết (ẩn/hiện) */}
         {expanded && (
-          <View className="bg-white rounded-lg p-4 my-3">
+          <View style={styles.detailsContainer}>
             <ExpenseComponent
               icon="help-circle-outline"
               text={category}
               onPress={() => setShowCategoryModal(true)}
             />
-            <ExpenseComponent
-              icon="calendar"
-              text={date.toLocaleDateString()}
-              onPress={showDatePicker}
-            />
-            <ExpenseComponent
-              icon="pencil"
-              text={note || "Ghi Chú"}
-              onPress={() => {}}
-            />
+            <ExpenseComponent icon="calendar" text={date.toLocaleDateString()} onPress={() => setShowPicker(true)} />
+            <ExpenseComponent icon="pencil" text={note || "Ghi Chú"} onPress={() => {}} />
           </View>
         )}
 
-        {/* Input ghi chú (nếu cần hiển thị riêng) */}
+        {/* Input ghi chú */}
         {expanded && (
           <TextInput
-            className="bg-white p-4 text-base rounded-lg my-3"
+            style={styles.input}
             placeholder="Nhập ghi chú"
             value={note}
             onChangeText={setNote}
@@ -107,28 +98,28 @@ const BudgetScreen = () => {
           />
         )}
 
-        {/* Modal Chọn Loại Ngân Sách */}
+        {/* Modal Chọn Loại ngân sách */}
         <Modal
           visible={showCategoryModal}
           transparent={true}
-          animationType="slide"
+          animationType="fade"
           onRequestClose={() => setShowCategoryModal(false)}
         >
-          <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-            <View className="bg-white p-5 rounded-lg w-4/5">
-              <Text className="text-lg font-bold">Chọn loại ngân sách</Text>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Chọn loại ngân sách</Text>
               <FlatList
                 data={categories}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
                   <TouchableOpacity
-                    className="p-3 border-b border-gray-200"
+                    style={styles.modalItem}
                     onPress={() => {
                       setCategory(item);
                       setShowCategoryModal(false);
                     }}
                   >
-                    <Text>{item}</Text>
+                    <Text style={styles.modalText}>{item}</Text>
                   </TouchableOpacity>
                 )}
               />
@@ -141,3 +132,89 @@ const BudgetScreen = () => {
 };
 
 export default BudgetScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f4f6f9",
+  },
+  scrollContainer: {
+    padding: 16,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  saveText: {
+    color: "#007bff",
+    fontWeight: "bold",
+  },
+  input: {
+    backgroundColor: "#fff",
+    padding: 14,
+    fontSize: 16,
+    borderRadius: 10,
+    marginVertical: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  toggleButton: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 14,
+    borderRadius: 10,
+    marginVertical: 6,
+  },
+  toggleText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  detailsContainer: {
+    backgroundColor: "#fff",
+    padding: 14,
+    borderRadius: 10,
+    marginVertical: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalItem: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  modalText: {
+    fontSize: 16,
+  },
+});

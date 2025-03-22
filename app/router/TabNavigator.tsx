@@ -84,7 +84,7 @@ export default function TabNavigator() {
             },
           }}
         /> */}
-        <Tab.Screen name="AddExpense" component={IncomeScreen} />
+        <Tab.Screen name="AddExpense" component={ExpenseScreen} />
         <Tab.Screen name="Analytic" component={AnalyticScreen} />
         <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>

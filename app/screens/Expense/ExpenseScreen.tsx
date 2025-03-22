@@ -8,7 +8,8 @@ import {
   ScrollView,
   Modal,
   FlatList,
-  Platform
+  Platform,
+  StyleSheet
 } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import ExpenseComponent from "@/app/Components/ExpenseComponent";
@@ -254,3 +255,5 @@ const ExpenseScreen = () => {
 };
 
 export default ExpenseScreen;
+
+
