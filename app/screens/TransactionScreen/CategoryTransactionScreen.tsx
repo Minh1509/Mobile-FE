@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, TouchableOpacity, FlatList, Image } from 'react-native';
+import { View, Text, FlatList, Image } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute, NavigationProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,8 +7,8 @@ import { RootStackParamList } from '@/app/Types/types';
 import { ITransaction } from '@/app/interface/Transaction';
 import { getCategoryIcon } from '@/app/utils/GetCategoryIcon';
 import { Header } from '@/app/Components/Header';
-import { getAmountColor } from '@/app/utils/GetAmountColor';
 import { mainStyles } from '@/app/styles';
+import TransactionItem from '@/app/Components/TransactionItem'; // Import TransactionItem
 
 const CategoryTransactionsScreen = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -16,13 +16,13 @@ const CategoryTransactionsScreen = () => {
     const { category, transactions } = route.params as RootStackParamList['CategoryTransactions'];
     const { imageSource } = getCategoryIcon(category);
 
-    // Memoized list of transactions in the category
+    // Lọc giao dịch theo danh mục
     const categoryTransactions = useMemo(
         () => transactions.filter(t => t.category === category),
         [transactions, category]
     );
 
-    // Memoized total amount calculation
+    // Tính tổng số tiền
     const totalAmount = useMemo(() => {
         const total = categoryTransactions.reduce((sum, item) => {
             const amountValue = parseFloat(item.amount.replace(/[^\d-]/g, '')) || 0;
@@ -31,7 +31,7 @@ const CategoryTransactionsScreen = () => {
         return `${total.toLocaleString('vi-VN')} VND`;
     }, [categoryTransactions]);
 
-    // Handle transaction item press
+    // Xử lý sự kiện khi nhấn vào giao dịch
     const handleTransactionPress = (transaction: ITransaction) => {
         navigation.navigate('TransactionDetail', { transaction });
     };
@@ -40,7 +40,7 @@ const CategoryTransactionsScreen = () => {
         <SafeAreaView className="flex-1 bg-gray-100">
             <Header onBack={() => navigation.goBack()} title={`Danh mục: ${category}`} />
 
-            {/* Category Summary */}
+            {/* Thông tin tổng quan về danh mục */}
             <View className="bg-white mx-4 my-6 p-5 rounded-xl shadow-lg">
                 <View className="flex-row items-center mb-4">
                     <Image source={imageSource} style={mainStyles.categoryIcon} />
@@ -51,12 +51,12 @@ const CategoryTransactionsScreen = () => {
                 </View>
                 <View className="border-t border-gray-200 pt-3">
                     <Text className="text-lg font-bold">
-                        Tổng: <Text className={getAmountColor(totalAmount)}>{totalAmount}</Text>
+                        Tổng: <Text className="text-blue-600">{totalAmount}</Text>
                     </Text>
                 </View>
             </View>
 
-            {/* List of Transactions */}
+            {/* Danh sách giao dịch */}
             <FlatList
                 data={categoryTransactions}
                 keyExtractor={(item) => item.id.toString()}
@@ -69,19 +69,7 @@ const CategoryTransactionsScreen = () => {
                     </View>
                 }
                 renderItem={({ item }) => (
-                    <TouchableOpacity
-                        className="bg-white flex-row items-center p-4 mb-3 rounded-xl shadow-md"
-                        onPress={() => handleTransactionPress(item)}
-                    >
-                        <View className="flex-1">
-                            <Text className="text-base font-bold">{item.description}</Text>
-                            <Text className="text-gray-500">{item.date}</Text>
-                        </View>
-                        <Text className={`text-base font-bold ${getAmountColor(item.amount)}`}>
-                            {item.amount}
-                        </Text>
-                        <Ionicons name="chevron-forward" size={20} color="gray" className="ml-2" />
-                    </TouchableOpacity>
+                    <TransactionItem transaction={item} onPress={handleTransactionPress} />
                 )}
             />
         </SafeAreaView>

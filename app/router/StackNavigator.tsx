@@ -40,5 +40,6 @@ export default function StackNavigator() {
       <Stack.Screen name="CategoryTransactions" component={CategoryTransactionsScreen} options={{ headerShown: false }} />
 
     </Stack.Navigator>
+
   );
 }

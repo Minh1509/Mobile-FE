@@ -26,7 +26,7 @@ const InputField: React.FC<InputFieldProps> = ({
     <View className="mb-4">
         <Text className="text-gray-700 font-semibold mb-2">{label}</Text>
         <TextInput
-            className={`bg-gray-100 p-4 rounded-xl shadow ${multiline ? 'h-28' : 'h-12'}`}
+            className={`bg-gray-100 p-4 rounded-xl shadow-md ${multiline ? 'h-28' : 'h-15'}`}
             value={value}
             onChangeText={onChangeText}
             placeholder={placeholder}
@@ -52,7 +52,7 @@ const SelectionGroup: React.FC<SelectionGroupProps> = ({ label, options, selecte
                 <TouchableOpacity
                     key={option}
                     onPress={() => onSelect(option)}
-                    className={`mr-2 mb-2 px-4 py-3 rounded-xl ${selected === option ? 'bg-blue-600' : 'bg-gray-200'
+                    className={`mr-2 mb-2 px-4 py-3 rounded-xl ${selected === option ? 'bg-green-600' : 'bg-gray-200'
                         }`}
                 >
                     <Text className={`font-medium ${selected === option ? 'text-white' : 'text-gray-800'}`}>{option}</Text>
@@ -69,8 +69,8 @@ const EditTransactionScreen = () => {
     const [form, setForm] = useState(transaction);
 
     const handleSave = () => {
-        const { amount, description, category, paymentMethod } = form;
-        if (!amount || !description || !category || !paymentMethod) {
+        const { amount, description, category, paymentMethod, date, time, location } = form;
+        if (!amount || !description || !category || !paymentMethod || !date || !time || !location) {
             return Alert.alert("Thiếu thông tin", "Vui lòng điền đầy đủ thông tin cần thiết");
         }
         navigation.navigate('TransactionDetail', { transaction: form });
@@ -101,7 +101,7 @@ const EditTransactionScreen = () => {
                     ))}
                     <SelectionGroup
                         label="Danh mục"
-                        options={["Di chuyển", "Ăn uống", "Tiền điện", "Tiền nước", "Khác"]}
+                        options={["Di chuyển", "Ăn uống", "Tiền điện", "Tiền nước", "Học tập", "Giải trí", "Internet", "Khác"]}
                         selected={form.category}
                         onSelect={category => setForm(prev => ({ ...prev, category }))}
                     />
@@ -112,12 +112,6 @@ const EditTransactionScreen = () => {
                         onSelect={paymentMethod => setForm(prev => ({ ...prev, paymentMethod }))}
                     />
                 </ScrollView>
-                <TouchableOpacity
-                    onPress={handleSave}
-                    className="bg-green-600 p-4 rounded-xl mx-5 mb-5 active:opacity-80"
-                >
-                    <Text className="text-white text-center font-semibold text-lg">Lưu</Text>
-                </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>
     );

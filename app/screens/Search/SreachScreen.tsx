@@ -9,11 +9,11 @@ import TransactionItem from '@/app/Components/TransactionItem';
 import EmptyResults from '@/app/Components/EmptyResults';
 import FilterModal from '@/app/Components/FiltalModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
 import { mockTransactions } from '@/app/utils/MockTransactions';
 import { HeaderSearch } from '@/app/Components/Header';
+import { normalizeDate } from '@/app/utils/normalizeDate';
 
-const CATEGORIES = ["Tất cả", "Di chuyển", "Ăn uống", "Tiền điện", "Tiền nước"];
+const CATEGORIES = ["Tất cả", "Di chuyển", "Ăn uống", "Tiền điện", "Tiền nước", "Học tập", "Giải trí", "Thuê nhà", "Thu nhập", "Internet"];
 const SORT_OPTIONS = ["Số tiền giảm dần", "Số tiền tăng dần", "Thời gian giảm dần", "Thời gian tăng dần"];
 
 const SearchScreen = () => {
@@ -33,12 +33,7 @@ const SearchScreen = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSearch = useCallback((query: string) => {
-    setSearchQuery(query);
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 300);
-  }, []);
-
+  const handleSearch = useCallback((query: string) => setSearchQuery(query), []);
   const handleTransactionPress = useCallback((transaction: ITransaction) => {
     navigation.navigate('TransactionDetail', { transaction });
   }, [navigation]);
@@ -50,41 +45,34 @@ const SearchScreen = () => {
   }, []);
 
   const filteredTransactions = useMemo(() => {
+    if (!transactions.length) return [];
+
     const queryLower = searchQuery.trim().toLowerCase();
-    const parseAmount = (amount: string) => parseInt(amount.replace(/[^\d-]/g, '')) || 0;
-    const parseDate = (dateStr: string) => {
-      const parts = dateStr.split(' ');
-      return parts.length >= 4 ? new Date(parseInt(parts[4]), parseInt(parts[2]) - 1, parseInt(parts[0])).getTime() : 0;
-    };
+    const parseAmount = (amount: string) => parseInt(amount.replace(/\D/g, '')) || 0;
 
     return transactions
-      .filter(({ description, category, paymentMethod, notes, location, amount, date }) =>
-        (!queryLower || [description, category, paymentMethod, notes, location, amount, date]
-          .some(field => field.toLowerCase().includes(queryLower))) &&
+      .filter(({ description = '', category = '', date = '' }) =>
+        (!queryLower || [description, category, date].some(field => field.toLowerCase().includes(queryLower))) &&
         (selectedCategory === "Tất cả" || category === selectedCategory)
       )
       .sort((a, b) => {
         const amountA = parseAmount(a.amount);
         const amountB = parseAmount(b.amount);
-        const dateA = parseDate(a.date);
-        const dateB = parseDate(b.date);
+        const dateA = Date.parse(normalizeDate(a.date));
+        const dateB = Date.parse(normalizeDate(b.date));
 
-        switch (selectedSort) {
-          case 'Số tiền giảm dần': return amountB - amountA;
-          case 'Số tiền tăng dần': return amountA - amountB;
-          case 'Thời gian giảm dần': return dateB - dateA;
-          case 'Thời gian tăng dần': return dateA - dateB;
-          default: return 0;
-        }
+        return selectedSort === 'Số tiền giảm dần' ? amountB - amountA :
+          selectedSort === 'Số tiền tăng dần' ? amountA - amountB :
+            selectedSort === 'Thời gian giảm dần' ? dateB - dateA :
+              dateA - dateB;
       });
   }, [transactions, searchQuery, selectedCategory, selectedSort]);
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <StatusBar style="dark" />
       <HeaderSearch onBack={navigation.goBack} title="Tìm kiếm giao dịch" />
 
-      <View className="px-4 py-3 bg-white border-b border-gray-200">
+      <View className="px-4 py-3 bg-gray border-b border-gray-200">
         <SearchBar searchQuery={searchQuery} setSearchQuery={handleSearch} onFilterPress={() => setFilterVisible(true)} />
       </View>
 
@@ -100,14 +88,31 @@ const SearchScreen = () => {
           <Text className="text-gray-500 mt-3">Đang tìm kiếm...</Text>
         </View>
       ) : (
-        <ScrollView className="flex-1 bg-gray-50" contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12, paddingBottom: 24, flexGrow: filteredTransactions.length === 0 ? 1 : undefined }}>
-          {filteredTransactions.length > 0 ? filteredTransactions.map(transaction => (
-            <TransactionItem key={transaction.id} transaction={transaction} onPress={() => handleTransactionPress(transaction)} />
-          )) : <EmptyResults searchQuery={searchQuery} onClearSearch={() => setSearchQuery('')} />}
+        <ScrollView
+          className="flex-1 bg-gray-50"
+          contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12, paddingBottom: 24, flexGrow: filteredTransactions.length ? undefined : 1 }}
+        >
+          {filteredTransactions.length ? (
+            filteredTransactions.map(transaction => (
+              <TransactionItem key={transaction.id} transaction={transaction} onPress={() => handleTransactionPress(transaction)} />
+            ))
+          ) : (
+            <EmptyResults searchQuery={searchQuery} onClearSearch={() => setSearchQuery('')} />
+          )}
         </ScrollView>
       )}
 
-      <FilterModal visible={filterVisible} onClose={() => setFilterVisible(false)} categories={CATEGORIES} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} sortOptions={SORT_OPTIONS} selectedSort={selectedSort} setSelectedSort={setSelectedSort} onReset={resetFilters} />
+      <FilterModal
+        visible={filterVisible}
+        onClose={() => setFilterVisible(false)}
+        categories={CATEGORIES}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        sortOptions={SORT_OPTIONS}
+        selectedSort={selectedSort}
+        setSelectedSort={setSelectedSort}
+        onReset={resetFilters}
+      />
     </SafeAreaView>
   );
 };

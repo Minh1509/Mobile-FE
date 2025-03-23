@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { ITransaction } from '@/app/interface/Transaction';
 import { getCategoryIcon } from '../utils/GetCategoryIcon';
-import { mainStyles } from '../styles';
 
 interface TransactionItemProps {
     transaction: ITransaction;
@@ -16,32 +15,33 @@ const TransactionItem = ({ transaction, onPress }: TransactionItemProps) => {
 
     return (
         <TouchableOpacity
-            className='bg-white rounded-xl p-5 mb-4 shadow-lg active:opacity-80'
+            className="bg-white rounded-xl p-3 mt-2 mb-4 shadow-md active:opacity-80"
             onPress={handlePress}
             activeOpacity={0.7}
         >
-            <View className='flex-row justify-between items-center mb-2'>
-                <Text className='text-lg font-semibold text-gray-800'>{transaction.date}</Text>
-                <Text className={`${transaction.amount.startsWith('-') ? 'text-red-500' : 'text-green-500'} text-xl font-bold`}>
+            {/* Ngày & Số tiền */}
+            <View className="flex-row justify-between items-center mb-3">
+                <Text className="text-base font-medium text-gray-600">{transaction.date}</Text>
+                <Text className={`${transaction.amount.startsWith('-') ? 'text-red-500' : 'text-green-500'} text-lg font-bold`}>
                     {transaction.amount}
                 </Text>
             </View>
 
-            <View className='flex-row items-center space-x-3'>
-                <View className='w-12 h-12 bg-gray-200 rounded-full items-center justify-center overflow-hidden'>
-                    <Image source={imageSource} style={mainStyles.categoryIcon} resizeMode="cover" />
+            {/* Icon & Danh mục */}
+            <View className="flex-row items-center space-x-4 py-2">
+                <View className="w-12 h-12 mr-5 bg-gray-100 rounded-full items-center justify-center overflow-hidden shadow-md">
+                    <Image source={imageSource} className="w-full h-full" resizeMode="cover" />
                 </View>
 
-                <View className='flex-1'>
-                    <Text className='text-gray-800 font-medium' numberOfLines={1}>{transaction.description}</Text>
-                    <Text className='text-xs text-gray-500 mt-1'>{transaction.category}</Text>
+                <Text className="text-lg font-semibold text-gray-800 flex-1">{transaction.category}</Text>
+                <View className="flex-row justify-end items-center mt-3">
+                    <Text className="text-sm text-blue-600 font-medium">Xem chi tiết</Text>
+                    <Ionicons name="chevron-forward" size={16} color="#2563eb" />
                 </View>
             </View>
 
-            <View className="flex-row justify-end items-center mt-3">
-                <Text className="text-sm text-blue-600 font-medium">Xem chi tiết</Text>
-                <Ionicons name="chevron-forward" size={14} color="#2563eb" />
-            </View>
+
+
         </TouchableOpacity>
     );
 };

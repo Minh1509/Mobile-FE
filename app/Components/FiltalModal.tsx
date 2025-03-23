@@ -91,7 +91,6 @@ const FilterModal = ({
                             <FilterOption options={categories} selected={selectedCategory} onSelect={setSelectedCategory} isCategory />
                         </>
                     )}
-
                     {/* Sort options */}
                     {hasSortOptions && (
                         <>

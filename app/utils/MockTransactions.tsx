@@ -132,5 +132,17 @@ export const mockTransactions: ITransaction[] = [
         location: "Hà Nội",
         image: "",
         notes: "Thanh toán cước internet"
+    },
+    {
+        id: 12,
+        description: "Internet mới nhất",
+        amount: "-200.000 VND",
+        category: "Internet",
+        date: "23/03/2025",
+        time: "10:00",
+        paymentMethod: "Chuyển khoản",
+        location: "Hà Nội",
+        image: "",
+        notes: "Thanh toán cước internet"
     }
 ];

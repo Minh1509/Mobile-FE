@@ -35,7 +35,7 @@ const CalendarComponent = ({ selectedDate, setSelectedDate, month, setMonth, yea
     }), [selectedDate]);
 
     return (
-        <View className="m-5 rounded-2xl shadow-md bg-white p-5">
+        <View className="m-4 rounded-3xl shadow-lg bg-white p-4">
             <Calendar
                 current={`${year}-${month.toString().padStart(2, '0')}-01`}
                 onDayPress={(day: { dateString: string; day: number; month: number; year: number }) => setSelectedDate(day.dateString)}
@@ -48,7 +48,36 @@ const CalendarComponent = ({ selectedDate, setSelectedDate, month, setMonth, yea
                     textMonthFontWeight: 'bold',
                     textDayHeaderFontWeight: 'bold',
                     textDayFontSize: 16,
-                    textMonthFontSize: 18
+                    textMonthFontSize: 18,
+                    textDayHeaderFontSize: 14,
+                    textSectionTitleColor: "#2d3748", // Section title color
+                    dayTextColor: "#4a5568", // Text color for days
+                    monthTextColor: "#2d3748", // Month color
+                    arrowStyle: { marginTop: 5 },
+                    "stylesheet.calendar.header": {
+                        week: {
+                            marginTop: 10,
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                        }
+                    },
+                    "stylesheet.calendar.day": {
+                        base: {
+                            width: 40,
+                            height: 40,
+                            borderRadius: 50,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            margin: 3,
+                        },
+                        selected: {
+                            backgroundColor: "#34d399", // Green for selected day
+                            borderRadius: 50,
+                        },
+                        today: {
+                            backgroundColor: "#fee2e2", // Light red for today
+                        },
+                    }
                 }}
                 onMonthChange={({ month, year }: { month: number; year: number }) => {
                     setMonth(month);
