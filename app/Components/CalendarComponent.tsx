@@ -1,6 +1,18 @@
-import { View, Text, TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { Calendar } from "react-native-calendars";
+import { View } from "react-native";
+import { Calendar, LocaleConfig } from "react-native-calendars";
+import { useMemo } from "react";
+
+// Cấu hình tiếng Việt cho lịch
+LocaleConfig.locales['vi'] = {
+    monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+        'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+    monthNamesShort: ['Th.1', 'Th.2', 'Th.3', 'Th.4', 'Th.5', 'Th.6',
+        'Th.7', 'Th.8', 'Th.9', 'Th.10', 'Th.11', 'Th.12'],
+    dayNames: ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'],
+    dayNamesShort: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+    today: 'Hôm nay'
+};
+LocaleConfig.defaultLocale = 'vi';
 
 interface CalendarComponentProps {
     selectedDate: string;
@@ -11,68 +23,38 @@ interface CalendarComponentProps {
     setYear: (year: number) => void;
 }
 
-const CalendarComponent = ({
-    selectedDate,
-    setSelectedDate,
-    month,
-    setMonth,
-    year,
-    setYear
-}: CalendarComponentProps) => {
-    const currentDate = new Date();
-    const today = currentDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+const CalendarComponent = ({ selectedDate, setSelectedDate, month, setMonth, year, setYear }: CalendarComponentProps) => {
+    const today = new Date().toISOString().split('T')[0]; // Định dạng YYYY-MM-DD
 
-    // Prepare markedDates object with both selected date and today
-    const markedDates = {
-        [selectedDate]: { selected: true, selectedColor: "green" },
-        [today]: {
-            selected: true,
-            selectedColor: "red",
-            marked: true,
-            dotColor: "white"
-        }
-    };
-
-    // If selected date is today, merge the styles
-    if (selectedDate === today) {
-        markedDates[today] = {
-            ...markedDates[today],
-            selected: true,
-            selectedColor: "red"
-        };
-    }
+    // Tối ưu hóa tính toán markedDates
+    const markedDates = useMemo(() => ({
+        [selectedDate]: { selected: true, selectedColor: "#34d399" }, // Màu xanh lục tươi sáng
+        [today]: selectedDate === today
+            ? { selected: true, selectedColor: "#ef4444", marked: true, dotColor: "white" } // Hôm nay màu đỏ khi chọn
+            : { marked: true, dotColor: "#ef4444" } // Hôm nay chấm đỏ khi không chọn
+    }), [selectedDate]);
 
     return (
-        <View>
-            {/* Header */}
-            <View className="flex-row items-center justify-between px-4 py-3 bg-green-300">
-                <TouchableOpacity onPress={() => setMonth(month === 1 ? 12 : month - 1)}>
-                    {/* <Ionicons name="chevron-back" size={24} color="black" /> */}
-                </TouchableOpacity>
-                <Text className="text-lg font-bold">{`Tháng ${month} năm ${year}`}</Text>
-                <TouchableOpacity onPress={() => setMonth(month === 12 ? 1 : month + 1)}>
-                    {/* <Ionicons name="chevron-forward" size={24} color="black" /> */}
-                </TouchableOpacity>
-            </View>
-
-            {/* Calendar */}
-            <View className="m-4 rounded-lg shadow bg-white p-4">
-                <Calendar
-                    current={`${year}-${month < 10 ? `0${month}` : month}-01`}
-                    onDayPress={(day: { dateString: string; }) => setSelectedDate(day.dateString)}
-                    markedDates={markedDates}
-                    theme={{
-                        selectedDayBackgroundColor: "green",
-                        todayTextColor: "red",
-                        arrowColor: "green",
-                        todayBackgroundColor: "#ffeeee", // Light red background for today
-                    }}
-                    onMonthChange={(monthData: { month: number; year: number; }) => {
-                        setMonth(monthData.month);
-                        setYear(monthData.year);
-                    }}
-                />
-            </View>
+        <View className="m-5 rounded-2xl shadow-md bg-white p-5">
+            <Calendar
+                current={`${year}-${month.toString().padStart(2, '0')}-01`}
+                onDayPress={(day: { dateString: string; day: number; month: number; year: number }) => setSelectedDate(day.dateString)}
+                markedDates={markedDates as { [key: string]: { selected?: boolean; selectedColor?: string; marked?: boolean; dotColor?: string } }}
+                theme={{
+                    selectedDayBackgroundColor: "#34d399", // Xanh lục sáng
+                    todayTextColor: "#ef4444", // Chữ màu đỏ
+                    arrowColor: "#34d399", // Mũi tên xanh lục
+                    todayBackgroundColor: "#fee2e2", // Nền nhạt đỏ cho hôm nay
+                    textMonthFontWeight: 'bold',
+                    textDayHeaderFontWeight: 'bold',
+                    textDayFontSize: 16,
+                    textMonthFontSize: 18
+                }}
+                onMonthChange={({ month, year }: { month: number; year: number }) => {
+                    setMonth(month);
+                    setYear(year);
+                }}
+            />
         </View>
     );
 };

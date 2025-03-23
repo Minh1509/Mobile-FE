@@ -1,7 +1,9 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useMemo, useCallback } from 'react';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { ITransaction } from '@/app/interface/Transaction';
+import { getCategoryIcon } from '../utils/GetCategoryIcon';
+import { mainStyles } from '../styles';
 
 interface TransactionItemProps {
     transaction: ITransaction;
@@ -9,40 +11,36 @@ interface TransactionItemProps {
 }
 
 const TransactionItem = ({ transaction, onPress }: TransactionItemProps) => {
-    const getCategoryIcon = (category: string) => {
-        switch (category) {
-            case "Di chuyển": return "car";
-            case "Ăn uống": return "restaurant";
-            case "Tiền điện": return "flash";
-            case "Tiền nước": return "water";
-            default: return "cart";
-        }
-    };
+    const { imageSource } = useMemo(() => getCategoryIcon(transaction.category), [transaction.category]);
+    const handlePress = useCallback(() => onPress(transaction), [transaction, onPress]);
 
     return (
         <TouchableOpacity
-            className='bg-white rounded-lg p-4 mb-4 shadow'
-            onPress={() => onPress(transaction)}
+            className='bg-white rounded-xl p-5 mb-4 shadow-lg active:opacity-80'
+            onPress={handlePress}
+            activeOpacity={0.7}
         >
-            <Text className='text-lg font-bold'>{transaction.date}</Text>
-            <Text className='text-red-500 text-xl'>{transaction.amount}</Text>
-            <View className='flex-row items-center mt-2'>
-                <View className='w-8 h-8 mr-2 bg-gray-200 rounded-full items-center justify-center'>
-                    <Ionicons
-                        name={getCategoryIcon(transaction.category)}
-                        size={16}
-                        color="gray"
-                    />
+            <View className='flex-row justify-between items-center mb-2'>
+                <Text className='text-lg font-semibold text-gray-800'>{transaction.date}</Text>
+                <Text className={`${transaction.amount.startsWith('-') ? 'text-red-500' : 'text-green-500'} text-xl font-bold`}>
+                    {transaction.amount}
+                </Text>
+            </View>
+
+            <View className='flex-row items-center space-x-3'>
+                <View className='w-12 h-12 bg-gray-200 rounded-full items-center justify-center overflow-hidden'>
+                    <Image source={imageSource} style={mainStyles.categoryIcon} resizeMode="cover" />
                 </View>
-                <Text className='text-gray-600'>{transaction.description}</Text>
-                <View className='ml-auto'>
-                    <Text className='text-xs text-gray-500'>{transaction.category}</Text>
+
+                <View className='flex-1'>
+                    <Text className='text-gray-800 font-medium' numberOfLines={1}>{transaction.description}</Text>
+                    <Text className='text-xs text-gray-500 mt-1'>{transaction.category}</Text>
                 </View>
             </View>
-            {/* Indicator that this is clickable */}
-            <View className="flex-row justify-end items-center mt-2">
-                <Text className="text-xs text-blue-500">Xem chi tiết</Text>
-                <Ionicons name="chevron-forward" size={12} color="#3b82f6" />
+
+            <View className="flex-row justify-end items-center mt-3">
+                <Text className="text-sm text-blue-600 font-medium">Xem chi tiết</Text>
+                <Ionicons name="chevron-forward" size={14} color="#2563eb" />
             </View>
         </TouchableOpacity>
     );

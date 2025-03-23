@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, Modal, Pressable } from 'react-native';
 
 interface FilterModalProps {
@@ -13,6 +13,53 @@ interface FilterModalProps {
     onReset: () => void;
 }
 
+const FilterOption = ({
+    options,
+    selected,
+    onSelect,
+    isCategory = false
+}: {
+    options: string[];
+    selected: string;
+    onSelect: (option: string) => void;
+    isCategory?: boolean;
+}) => {
+    return (
+        <View className={`mb-6 ${isCategory ? 'flex-row flex-wrap' : ''}`}>
+            {options.map(option => (
+                <TouchableOpacity
+                    key={option}
+                    className={`mr-2 mb-2 p-2 rounded-full border ${selected === option
+                        ? isCategory
+                            ? 'bg-green-500 border-green-500'
+                            : 'bg-blue-100'
+                        : 'bg-white border-gray-300'
+                        }`}
+                    onPress={() => onSelect(option)}
+                >
+                    <View className="flex-row items-center">
+                        {isCategory ? (
+                            <Text className={selected === option ? 'text-white' : 'text-gray-700'}>
+                                {option}
+                            </Text>
+                        ) : (
+                            <>
+                                <View
+                                    className={`w-5 h-5 rounded-full border mr-3 items-center justify-center ${selected === option ? 'border-blue-500' : 'border-gray-300'
+                                        }`}
+                                >
+                                    {selected === option && <View className="w-3 h-3 rounded-full bg-blue-500" />}
+                                </View>
+                                <Text className="text-gray-700">{option}</Text>
+                            </>
+                        )}
+                    </View>
+                </TouchableOpacity>
+            ))}
+        </View>
+    );
+};
+
 const FilterModal = ({
     visible,
     onClose,
@@ -24,77 +71,42 @@ const FilterModal = ({
     setSelectedSort,
     onReset
 }: FilterModalProps) => {
+    const hasCategories = useMemo(() => categories.length > 0, [categories]);
+    const hasSortOptions = useMemo(() => sortOptions.length > 0, [sortOptions]);
+
     return (
-        <Modal
-            transparent={true}
-            visible={visible}
-            animationType="slide"
-            onRequestClose={onClose}
-        >
-            <Pressable
-                className='flex-1 bg-black bg-opacity-50 justify-end'
-                onPress={onClose}
-            >
-                <Pressable
-                    className='bg-white rounded-t-3xl p-6'
-                    onPress={(e) => e.stopPropagation()}
-                >
-                    <View className='items-center mb-4'>
-                        <View className='w-12 h-1 bg-gray-300 rounded-full'></View>
+        <Modal transparent visible={visible} animationType="slide" onRequestClose={onClose}>
+            <Pressable className="flex-1 bg-black bg-opacity-50 justify-end" onPress={onClose}>
+                <Pressable className="bg-white rounded-t-3xl p-6" onPress={(e) => e.stopPropagation()}>
+                    <View className="items-center mb-4">
+                        <View className="w-12 h-1 bg-gray-300 rounded-full" />
                     </View>
 
-                    <Text className='text-xl font-bold mb-4'>Bộ lọc</Text>
+                    <Text className="text-xl font-bold mb-4">Bộ lọc</Text>
 
                     {/* Category filter */}
-                    <Text className='text-lg font-medium mb-2'>Danh mục</Text>
-                    <View className='flex-row flex-wrap mb-6'>
-                        {categories.map(category => (
-                            <TouchableOpacity
-                                key={category}
-                                className={`mr-2 mb-2 p-2 rounded-full border ${selectedCategory === category ? 'bg-green-500 border-green-500' : 'bg-white border-gray-300'}`}
-                                onPress={() => setSelectedCategory(category)}
-                            >
-                                <Text className={`${selectedCategory === category ? 'text-white' : 'text-gray-700'}`}>
-                                    {category}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
+                    {hasCategories && (
+                        <>
+                            <Text className="text-lg font-medium mb-2">Danh mục</Text>
+                            <FilterOption options={categories} selected={selectedCategory} onSelect={setSelectedCategory} isCategory />
+                        </>
+                    )}
 
                     {/* Sort options */}
-                    <Text className='text-lg font-medium mb-2'>Sắp xếp</Text>
-                    <View className='mb-6'>
-                        {sortOptions.map(option => (
-                            <TouchableOpacity
-                                key={option}
-                                className={`mb-2 p-3 rounded-lg ${selectedSort === option ? 'bg-blue-100' : 'bg-white'}`}
-                                onPress={() => setSelectedSort(option)}
-                            >
-                                <View className='flex-row items-center'>
-                                    <View className={`w-5 h-5 rounded-full border mr-3 items-center justify-center ${selectedSort === option ? 'border-blue-500' : 'border-gray-300'}`}>
-                                        {selectedSort === option && (
-                                            <View className='w-3 h-3 rounded-full bg-blue-500' />
-                                        )}
-                                    </View>
-                                    <Text className='text-gray-700'>{option}</Text>
-                                </View>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
+                    {hasSortOptions && (
+                        <>
+                            <Text className="text-lg font-medium mb-2">Sắp xếp</Text>
+                            <FilterOption options={sortOptions} selected={selectedSort} onSelect={setSelectedSort} />
+                        </>
+                    )}
 
                     {/* Action buttons */}
-                    <View className='flex-row'>
-                        <TouchableOpacity
-                            className='flex-1 p-3 bg-gray-200 rounded-lg mr-2'
-                            onPress={onReset}
-                        >
-                            <Text className='text-center font-medium'>Đặt lại</Text>
+                    <View className="flex-row">
+                        <TouchableOpacity className="flex-1 p-3 bg-gray-200 rounded-lg mr-2" onPress={onReset}>
+                            <Text className="text-center font-medium">Đặt lại</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            className='flex-1 p-3 bg-green-500 rounded-lg'
-                            onPress={onClose}
-                        >
-                            <Text className='text-white text-center font-medium'>Áp dụng</Text>
+                        <TouchableOpacity className="flex-1 p-3 bg-green-500 rounded-lg" onPress={onClose}>
+                            <Text className="text-white text-center font-medium">Áp dụng</Text>
                         </TouchableOpacity>
                     </View>
                 </Pressable>

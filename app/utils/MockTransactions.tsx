@@ -1,14 +1,16 @@
 import { ITransaction } from "../interface/Transaction";
 
-export const transactions: ITransaction[] = [
+export const mockTransactions: ITransaction[] = [
     {
         id: 1,
         description: "Di chuyển",
         amount: "-50.000 VND",
         category: "Di chuyển",
         date: "20/03/2025",
+        time: "09:00",
         paymentMethod: "Tiền mặt",
         location: "Hà Nội",
+        image: "https://th.bing.com/th/id/OIP.OkKi7MagZ2MS57OrhjQ7hQAAAA?rs=1&pid=ImgDetMain",
         notes: ""
     },
     {
@@ -19,7 +21,9 @@ export const transactions: ITransaction[] = [
         date: "20/03/2025",
         paymentMethod: "Tiền mặt",
         location: "Hà Nội",
-        notes: ""
+        image: "https://th.bing.com/th/id/OIP.bi66zoR_BWkIErHOvc3GuAHaEl?rs=1&pid=ImgDetMain",
+        notes: "",
+        time: "10:00",
     },
     {
         id: 2,
@@ -27,8 +31,10 @@ export const transactions: ITransaction[] = [
         amount: "-300.000 VND",
         category: "Tiền điện",
         date: "20/03/2025",
+        time: "10:00",
         paymentMethod: "Chuyển khoản",
         location: "Hà Nội",
+        image: "",
         notes: "Hoá đơn điện tháng 3/2025"
     },
     {
@@ -37,8 +43,10 @@ export const transactions: ITransaction[] = [
         amount: "-100.000 VND",
         category: "Tiền nước",
         date: "20/03/2025",
+        time: "10:00",
         paymentMethod: "Tiền mặt",
         location: "Hà Nội",
+        image: "",
         notes: ""
     },
     {
@@ -47,9 +55,11 @@ export const transactions: ITransaction[] = [
         amount: "1.000.000 VND",
         category: "Thu nhập",
         date: "20/03/2025",
+        time: "10:00",
         paymentMethod: "Chuyển khoản",
         location: "Hà Nội",
-        notes: "Tiền bán đồ cũ"
+        notes: "Tiền bán đồ cũ",
+        image: "",
     },
     {
         id: 5,
@@ -57,8 +67,10 @@ export const transactions: ITransaction[] = [
         amount: "-200.000 VND",
         category: "Ăn uống",
         date: "19/03/2025",
+        time: "10:00",
         paymentMethod: "Tiền mặt",
         location: "Hà Nội",
+        image: "",
         notes: "Ăn tối tại nhà hàng"
     },
     {
@@ -67,8 +79,10 @@ export const transactions: ITransaction[] = [
         amount: "-500.000 VND",
         category: "Mua sắm",
         date: "18/03/2025",
+        time: "10:00",
         paymentMethod: "Chuyển khoản",
         location: "Hà Nội",
+        image: "",
         notes: "Mua quần áo"
     },
     {
@@ -77,8 +91,10 @@ export const transactions: ITransaction[] = [
         amount: "-3.000.000 VND",
         category: "Thuê nhà",
         date: "17/03/2025",
+        time: "10:00",
         paymentMethod: "Chuyển khoản",
         location: "Hà Nội",
+        image: "",
         notes: "Tiền thuê nhà tháng 3/2025"
     },
     {
@@ -87,8 +103,10 @@ export const transactions: ITransaction[] = [
         amount: "15.000.000 VND",
         category: "Thu nhập",
         date: "16/03/2025",
+        time: "10:00",
         paymentMethod: "Chuyển khoản",
         location: "Hà Nội",
+        image: "",
         notes: "Lương công ty"
     },
     {
@@ -97,8 +115,10 @@ export const transactions: ITransaction[] = [
         amount: "-100.000 VND",
         category: "Di chuyển",
         date: "15/03/2025",
+        time: "10:00",
         paymentMethod: "Tiền mặt",
         location: "Hà Nội",
+        image: "",
         notes: "Đổ xăng xe máy"
     },
     {
@@ -107,8 +127,10 @@ export const transactions: ITransaction[] = [
         amount: "-200.000 VND",
         category: "Internet",
         date: "14/03/2025",
+        time: "10:00",
         paymentMethod: "Chuyển khoản",
         location: "Hà Nội",
+        image: "",
         notes: "Thanh toán cước internet"
     }
 ];
