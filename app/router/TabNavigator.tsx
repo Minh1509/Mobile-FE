@@ -5,6 +5,10 @@ import HomeScreen from "../screens/Home/HomeScreen";
 import CalendarScreen from "../screens/Calendar/CalendarScreen";
 import ProfileScreen from "../screens/Profile/ProfileScreen";
 import AnalyticScreen from "../screens/Analytic/AnalyticScreen";
+import { useNavigation, StackActions } from "@react-navigation/native";
+import ExpenseScreen from "../screens/Expense/ExpenseScreen";
+import IncomeScreen from "../screens/Income/IncomeScreen";
+import BudgetScreen from "../screens/Budget/BudgetScreen";
 import SearchScreen from "../screens/Search/SreachScreen";
 
 const Tab = createBottomTabNavigator();
@@ -38,14 +42,14 @@ export default function TabNavigator() {
           tabBarStyle: { height: 60 },
         })}
       >
+ 
+        <Tab.Screen name="AddExpense" component={ExpenseScreen} />
         <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: "Trang chủ", headerShown: false }} />
         <Tab.Screen name="Calendar" component={CalendarScreen} options={{ tabBarLabel: "Lịch", headerShown: false }} />
         <Tab.Screen name="Search" component={SearchScreen} options={{ tabBarLabel: "Tìm kiếm", headerShown: false }} />
         <Tab.Screen name="Utility" component={AnalyticScreen} options={{ tabBarLabel: "Tiện ích", headerShown: false }} />
         <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: "Tài khoản", headerShown: false }} />
       </Tab.Navigator>
-
-
     </>
   );
 }
