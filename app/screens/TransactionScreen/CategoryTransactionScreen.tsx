@@ -25,7 +25,7 @@ const CategoryTransactionsScreen = () => {
     // Tính tổng số tiền
     const totalAmount = useMemo(() => {
         const total = categoryTransactions.reduce((sum, item) => {
-            const amountValue = parseFloat(item.amount.replace(/[^\d-]/g, '')) || 0;
+            const amountValue = item.amount;
             return sum + amountValue;
         }, 0);
         return `${total.toLocaleString('vi-VN')} VND`;

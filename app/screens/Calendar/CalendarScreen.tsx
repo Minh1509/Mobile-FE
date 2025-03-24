@@ -5,7 +5,7 @@ import CalendarComponent from "@/app/Components/CalendarComponent";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "@/app/Types/types";
-import { mockTransactions } from "@/app/utils/MockTransactions";
+import { transactions } from "@/app/utils/Transactions";
 import { normalizeDate } from "@/app/utils/normalizeDate";
 import { getCategoryIcon } from "@/app/utils/GetCategoryIcon";
 import { mainStyles } from "@/app/styles";
@@ -20,11 +20,11 @@ export default function CalendarScreen() {
     const [year, setYear] = useState(currentDate.getFullYear());
 
     // Lọc giao dịch theo ngày đã chọn
-    const filteredTransactions = mockTransactions.filter(t => normalizeDate(t.date) === selectedDate);
+    const filteredTransactions = transactions.filter(t => normalizeDate(t.date) === selectedDate);
 
     // Tổng hợp danh mục và số tiền
     const categoryTotals = filteredTransactions.reduce((acc, { category, amount }) => {
-        const value = parseFloat(amount.replace(/[^\d.-]/g, "").replace(/\./g, "").replace(/,/g, "."));
+        const value = amount;
         acc[category] = (acc[category] || 0) + (isNaN(value) ? 0 : value);
         return acc;
     }, {} as Record<string, number>);

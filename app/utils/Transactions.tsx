@@ -1,10 +1,10 @@
 import { ITransaction } from "../interface/Transaction";
 
-export const mockTransactions: ITransaction[] = [
+export const transactions: ITransaction[] = [
     {
         id: 1,
         description: "Di chuyển",
-        amount: "-50.000 VND",
+        amount: -50000,
         category: "Di chuyển",
         date: "20/03/2025",
         time: "09:00",
@@ -16,7 +16,7 @@ export const mockTransactions: ITransaction[] = [
     {
         id: 11,
         description: "Di chuyển",
-        amount: "-50.000 VND",
+        amount: -50000,
         category: "Di chuyển",
         date: "20/03/2025",
         paymentMethod: "Tiền mặt",
@@ -28,7 +28,7 @@ export const mockTransactions: ITransaction[] = [
     {
         id: 2,
         description: "Tiền điện tháng 3",
-        amount: "-300.000 VND",
+        amount: -300000,
         category: "Tiền điện",
         date: "20/03/2025",
         time: "10:00",
@@ -40,7 +40,7 @@ export const mockTransactions: ITransaction[] = [
     {
         id: 3,
         description: "Tiền nước",
-        amount: "-100.000 VND",
+        amount: -100000,
         category: "Tiền nước",
         date: "20/03/2025",
         time: "10:00",
@@ -52,7 +52,7 @@ export const mockTransactions: ITransaction[] = [
     {
         id: 4,
         description: "Thu nhập khác",
-        amount: "1.000.000 VND",
+        amount: 1000000,
         category: "Thu nhập",
         date: "20/03/2025",
         time: "10:00",
@@ -64,7 +64,7 @@ export const mockTransactions: ITransaction[] = [
     {
         id: 5,
         description: "Ăn uống",
-        amount: "-200.000 VND",
+        amount: -200000,
         category: "Ăn uống",
         date: "19/03/2025",
         time: "10:00",
@@ -76,7 +76,7 @@ export const mockTransactions: ITransaction[] = [
     {
         id: 6,
         description: "Mua sắm",
-        amount: "-500.000 VND",
+        amount: -500000,
         category: "Mua sắm",
         date: "18/03/2025",
         time: "10:00",
@@ -88,7 +88,7 @@ export const mockTransactions: ITransaction[] = [
     {
         id: 7,
         description: "Tiền thuê nhà",
-        amount: "-3.000.000 VND",
+        amount: -3000000,
         category: "Thuê nhà",
         date: "17/03/2025",
         time: "10:00",
@@ -100,7 +100,7 @@ export const mockTransactions: ITransaction[] = [
     {
         id: 8,
         description: "Tiền lương tháng 3",
-        amount: "15.000.000 VND",
+        amount: 15000000,
         category: "Thu nhập",
         date: "16/03/2025",
         time: "10:00",
@@ -112,7 +112,7 @@ export const mockTransactions: ITransaction[] = [
     {
         id: 9,
         description: "Xăng xe",
-        amount: "-100.000 VND",
+        amount: -100000,
         category: "Di chuyển",
         date: "15/03/2025",
         time: "10:00",
@@ -124,7 +124,7 @@ export const mockTransactions: ITransaction[] = [
     {
         id: 10,
         description: "Internet tháng 3",
-        amount: "-200.000 VND",
+        amount: -200000,
         category: "Internet",
         date: "14/03/2025",
         time: "10:00",
@@ -136,7 +136,7 @@ export const mockTransactions: ITransaction[] = [
     {
         id: 12,
         description: "Internet mới nhất",
-        amount: "-200.000 VND",
+        amount: -200000,
         category: "Internet",
         date: "23/03/2025",
         time: "10:00",

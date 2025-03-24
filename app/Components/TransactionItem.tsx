@@ -22,7 +22,7 @@ const TransactionItem = ({ transaction, onPress }: TransactionItemProps) => {
             {/* Ngày & Số tiền */}
             <View className="flex-row justify-between items-center mb-3">
                 <Text className="text-base font-medium text-gray-600">{transaction.date}</Text>
-                <Text className={`${transaction.amount.startsWith('-') ? 'text-red-500' : 'text-green-500'} text-lg font-bold`}>
+                <Text className={`${transaction.amount < 0 ? 'text-red-500' : 'text-green-500'} text-lg font-bold`}>
                     {transaction.amount}
                 </Text>
             </View>
