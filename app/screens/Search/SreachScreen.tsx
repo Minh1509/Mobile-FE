@@ -9,7 +9,7 @@ import TransactionItem from '@/app/Components/TransactionItem';
 import EmptyResults from '@/app/Components/EmptyResults';
 import FilterModal from '@/app/Components/FiltalModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { mockTransactions } from '@/app/utils/MockTransactions';
+import { transactions } from '@/app/utils/Transactions';
 import { HeaderSearch } from '@/app/Components/Header';
 import { normalizeDate } from '@/app/utils/normalizeDate';
 
@@ -27,7 +27,7 @@ const SearchScreen = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setTransactions(mockTransactions);
+      setTransactions(transactions);
       setIsLoading(false);
     }, 800);
     return () => clearTimeout(timer);

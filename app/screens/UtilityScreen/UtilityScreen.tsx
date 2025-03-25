@@ -20,6 +20,9 @@ const utilities: UtilityItem[] = [
     { id: '2', title: 'Biểu đồ phân tích theo danh mục', icon: 'git-network' },
     { id: '3', title: 'Biểu đồ xu hướng', icon: 'bar-chart' },
     { id: '4', title: 'Biểu đồ so sánh thu chi', icon: 'stats-chart' },
+    { id: '5', title: 'Thêm chi tiêu', icon: 'cash-outline' },
+    { id: '6', title: 'Thêm thu nhập', icon: 'wallet-outline' },
+    { id: '7', title: 'Thiết lập ngân sách', icon: 'calculator-outline' },
 ];
 
 const UtilityScreen = () => {

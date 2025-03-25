@@ -24,7 +24,7 @@ const TransactionDetailScreen = () => {
     const navigation = useNavigation<TransactionDetailNavigationProp>();
     const { params: { transaction } } = useRoute<TransactionDetailRouteProp>();
     const { imageSource } = getCategoryIcon(transaction.category);
-    const isNegative = transaction.amount.includes('-');
+    const isNegative = transaction.amount < 0;
 
     const handleDelete = () => Alert.alert("Xóa giao dịch", "Bạn có chắc chắn muốn xóa?", [
         { text: "Hủy", style: "cancel" },
