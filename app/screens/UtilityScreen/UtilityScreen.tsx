@@ -3,9 +3,15 @@
 import React from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from "../../Types/types";
 
 // Định nghĩa kiểu cho icon từ Ionicons
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
+
+// Định nghĩa kiểu navigation 
+type UtilityScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 // Định nghĩa interface cho UtilityItem, sử dụng IoniconsName cho icon
 interface UtilityItem {
@@ -26,9 +32,22 @@ const utilities: UtilityItem[] = [
 ];
 
 const UtilityScreen = () => {
+    const navigation = useNavigation<UtilityScreenNavigationProp>();
+
+    // Thêm xử lý sự kiện khi nhấn vào từng tiện ích
+    const handlePress = (title: string) => {
+        if (title === 'Thêm chi tiêu') {
+            navigation.navigate('AddExpense');
+        } else if (title === 'Thêm thu nhập') {
+            navigation.navigate('AddIncome');
+        } else if (title === 'Thiết lập ngân sách') {
+            navigation.navigate('AddBudget');
+        }
+    };
+
     // Hàm render từng mục trong danh sách
     const renderItem = ({ item }: { item: UtilityItem }) => (
-        <TouchableOpacity style={styles.itemContainer}>
+        <TouchableOpacity style={styles.itemContainer} onPress={() => handlePress(item.title)}>
             <View style={styles.iconContainer}>
                 <Ionicons name={item.icon} size={24} color="#FF6347" />
             </View>

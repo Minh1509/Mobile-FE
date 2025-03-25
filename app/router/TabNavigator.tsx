@@ -44,7 +44,7 @@ export default function TabNavigator() {
         })}
       >
  
-        <Tab.Screen name="AddExpense" component={ExpenseScreen} />
+    
         <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: "Trang chủ", headerShown: false }} />
         <Tab.Screen name="Calendar" component={CalendarScreen} options={{ tabBarLabel: "Lịch", headerShown: false }} />
         <Tab.Screen name="Search" component={SearchScreen} options={{ tabBarLabel: "Tìm kiếm", headerShown: false }} />

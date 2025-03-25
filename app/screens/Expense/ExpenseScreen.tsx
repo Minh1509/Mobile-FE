@@ -9,7 +9,8 @@ import {
   Modal,
   FlatList,
   Platform,
-  StyleSheet
+  StyleSheet,
+  
 } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import ExpenseComponent from "@/app/Components/ExpenseComponent";
@@ -17,7 +18,7 @@ import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import { Image } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import ExpenseComponentV2 from "@/app/Components/ExpenseComponentV2";
-
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 const ExpenseScreen = () => {
   const [money, setMoney] = useState("");
   const [note, setNote] = useState("");
@@ -29,6 +30,10 @@ const ExpenseScreen = () => {
   const [showDetails, setShowDetails] = useState(true);
   const [showPicker, setShowPicker] = useState(false);
   const [pickerMode, setPickerMode] = useState<"date" | "time">("date");
+  const [description, setDescription] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
 
   const [imageUri, setImageUri] = useState<string | null>(null);
 
@@ -94,22 +99,22 @@ const ExpenseScreen = () => {
   };
   
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
-      <ScrollView className="p-4">
+    <SafeAreaView style={styles.container}>
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scrollContainer}>
         {/* Header */}
-        <View className="flex-row items-center justify-between">
+        <View style={styles.header}>
           <TouchableOpacity onPress={() => {}}>
-            <Text className="text-lg">{"<"}</Text>
+            <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
           </TouchableOpacity>
-          <Text className="text-lg font-bold">Thêm Chi Tiêu</Text>
+          <Text style={styles.headerText}>Thêm Chi Tiêu</Text>
           <TouchableOpacity>
-            <Text className="text-blue-500 font-bold">Lưu</Text>
+            <Text style={styles.saveText}>Lưu</Text>
           </TouchableOpacity>
         </View>
 
         {/* Input số tiền */}
         <TextInput
-          className="bg-white p-4 text-lg rounded-lg my-3"
+          style={styles.input}
           placeholder="Nhập số tiền"
           keyboardType="numeric"
           value={money}
@@ -119,16 +124,28 @@ const ExpenseScreen = () => {
         {showDetails && (
           <>
             {/* Các mục chi tiêu */}
-            <View className="bg-white rounded-lg p-4 my-3">
+            <View style={styles.card}>
               <ExpenseComponent
                 icon="help-circle-outline"
                 text={category}
                 onPress={() => setShowCategoryModal(true)}
               />
+              {/* Ô nhập mô tả */}
+              <TextInput
+                style={styles.inputDescription}
+                placeholder="Nhập mô tả"
+                value={description}
+                onChangeText={setDescription}
+              />
               <ExpenseComponent
                 icon="map-marker"
                 text={location}
                 onPress={() => setShowLocationModal(true)}
+              />
+              <ExpenseComponent
+                icon="credit-card"
+                text={paymentMethod || "Chọn phương thức thanh toán"}
+                onPress={() => setShowPaymentModal(true)}
               />
               <ExpenseComponent
                 icon="calendar"
@@ -160,11 +177,9 @@ const ExpenseScreen = () => {
               onChangeText={setNote}
             />
 
-            <View className="bg-white rounded-lg p-4 my-3">
+            <View className="bg-white rounded-lg p-2 my-3">
               {imageUri && <Image source={{ uri: imageUri }} className="w-full h-60 mt-3 rounded-lg object-cover" />}
-              {/* <ExpenseComponent icon="image" text="Chọn ảnh" onPress={pickImage} />
-              <ExpenseComponent icon="camera" text="Chụp ảnh" onPress={takePhoto} /> */}
-              <View className="flex-row items-center justify-between mt-4">
+              <View className="flex-row items-center justify-between mt-2">
                 <ExpenseComponentV2 icon="image" text="Chọn ảnh" onPress={pickImage} />
                 <View className="w-px h-10 bg-gray-300" /> {/* Đường kẻ phân cách */}
                 <ExpenseComponentV2 icon="camera" text="Chụp ảnh" onPress={takePhoto} />
@@ -175,10 +190,10 @@ const ExpenseScreen = () => {
 
         {/* Nút ẩn/hiện chi tiết */}
         <TouchableOpacity
-          className="p-3 bg-blue-500 rounded-lg my-3"
+          style={styles.toggleButton}
           onPress={() => setShowDetails(!showDetails)}
         >
-          <Text className="text-white text-center">
+          <Text style={styles.toggleButtonText}>
             {showDetails ? "Ẩn bớt" : "Hiển thêm"}
           </Text>
         </TouchableOpacity>
@@ -199,21 +214,21 @@ const ExpenseScreen = () => {
           animationType="slide"
           onRequestClose={() => setShowCategoryModal(false)}
         >
-          <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-            <View className="bg-white p-5 rounded-lg w-4/5">
-              <Text className="text-lg font-bold">Chọn loại chi tiêu</Text>
+          <View style={styles.overlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Chọn loại chi tiêu</Text>
               <FlatList
                 data={categories}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
                   <TouchableOpacity
-                    className="p-3 border-b border-gray-200"
+                    style={styles.listItem}
                     onPress={() => {
                       setCategory(item);
                       setShowCategoryModal(false);
                     }}
                   >
-                    <Text>{item}</Text>
+                    <Text>{String(item)}</Text>
                   </TouchableOpacity>
                 )}
               />
@@ -228,18 +243,47 @@ const ExpenseScreen = () => {
           animationType="slide"
           onRequestClose={() => setShowLocationModal(false)}
         >
-          <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-            <View className="bg-white p-5 rounded-lg w-4/5">
-              <Text className="text-lg font-bold">Chọn địa điểm</Text>
+          <View style={styles.overlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Chọn địa điểm</Text>
               <FlatList
                 data={locations}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
                   <TouchableOpacity
-                    className="p-3 border-b border-gray-200"
+                    style={styles.listItem}
                     onPress={() => {
                       setLocation(item);
                       setShowLocationModal(false);
+                    }}
+                  >
+                    <Text>{String(item)}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          </View>
+        </Modal>
+
+        {/* Modal Chọn Phương Thức Thanh Toán */}
+        <Modal
+          visible={showPaymentModal}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowPaymentModal(false)}
+        >
+          <View style={styles.overlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Chọn phương thức thanh toán</Text>
+              <FlatList
+                data={["Tiền mặt", "Thẻ tín dụng", "Ví điện tử"]}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.listItem}
+                    onPress={() => {
+                      setPaymentMethod(item);
+                      setShowPaymentModal(false);
                     }}
                   >
                     <Text>{item}</Text>
@@ -253,6 +297,24 @@ const ExpenseScreen = () => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#f3f4f6" },
+  scrollContainer: { flexGrow: 1, padding: 16 },
+  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
+  headerText: { fontSize: 18, fontWeight: "bold" },
+  saveText: { color: "#1E90FF", fontWeight: "bold" },
+  input: { backgroundColor: "#fff", padding: 16, fontSize: 18, borderRadius: 8, marginBottom: 12 },
+  card: { backgroundColor: "#fff", borderRadius: 8, padding: 16, marginBottom: 12 },
+  toggleButton: { backgroundColor: "#1E90FF", padding: 12, borderRadius: 8, alignItems: "center" },
+  toggleButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  overlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+  modalContainer: { backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%' },
+  modalTitle: { fontSize: 18, fontWeight: 'bold' },
+  listItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc' },
+  inputDescription: { backgroundColor: "#f8f9fa", borderRadius: 10, padding: 10, fontSize: 16, color: "#333", marginVertical: 6, shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2, elevation: 2 },
+});
+
 
 export default ExpenseScreen;
 

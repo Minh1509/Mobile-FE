@@ -11,6 +11,10 @@ import RegisterScreen from "../screens/Auth/RegisterScreen/RegisterScreen";
 import TransactionDetailScreen from "../screens/TransactionScreen/TransactionDetailScreen";
 import EditTransactionScreen from "../screens/TransactionScreen/EditTransactionScreen";
 import CategoryTransactionsScreen from "../screens/TransactionScreen/CategoryTransactionScreen";
+import ExpenseScreen from "../screens/Expense/ExpenseScreen";
+import IncomeScreen from "../screens/Income/IncomeScreen";
+import BudgetScreen from "../screens/Budget/BudgetScreen";
+
 const Stack = createStackNavigator<RootStackParamList>();
 
 export type LoginScreenNavigationProp = StackNavigationProp<
@@ -38,7 +42,9 @@ export default function StackNavigator() {
       <Stack.Screen name="TransactionDetail" component={TransactionDetailScreen} options={{ headerShown: false }} />
       <Stack.Screen name="EditTransaction" component={EditTransactionScreen} options={{ headerShown: false }} />
       <Stack.Screen name="CategoryTransactions" component={CategoryTransactionsScreen} options={{ headerShown: false }} />
-
+      <Stack.Screen name="AddExpense" component={ExpenseScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="AddIncome" component={IncomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="AddBudget" component={BudgetScreen} options={{ headerShown: false }}/>
     </Stack.Navigator>
 
   );

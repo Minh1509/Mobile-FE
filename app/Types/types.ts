@@ -7,6 +7,9 @@ export type RootStackParamList = {
   TransactionDetail: { transaction: ITransaction };
   EditTransaction: { transaction: ITransaction };
   CategoryTransactions: { category: string, transactions: ITransaction[] };
+  AddExpense: undefined;
+  AddIncome: undefined;
+  AddBudget: undefined;
 };
 
 export type BottomTabParamList = {
