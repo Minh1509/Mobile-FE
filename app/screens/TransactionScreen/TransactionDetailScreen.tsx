@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { getCategoryIcon } from '@/app/utils/GetCategoryIcon';
 import { Header } from '@/app/Components/Header';
 import { mainStyles } from '@/app/styles';
+import VNDFormat from '@/app/utils/MoneyParse';
 
 type TransactionDetailRouteProp = RouteProp<RootStackParamList, 'TransactionDetail'>;
 type TransactionDetailNavigationProp = StackNavigationProp<RootStackParamList, 'TransactionDetail'>;
@@ -25,6 +26,7 @@ const TransactionDetailScreen = () => {
     const { params: { transaction } } = useRoute<TransactionDetailRouteProp>();
     const { imageSource } = getCategoryIcon(transaction.category);
     const isNegative = transaction.amount < 0;
+    const parseAmount = VNDFormat(transaction.amount)
 
     const handleDelete = () => Alert.alert("Xóa giao dịch", "Bạn có chắc chắn muốn xóa?", [
         { text: "Hủy", style: "cancel" },
@@ -44,7 +46,7 @@ const TransactionDetailScreen = () => {
                 <View className="bg-white rounded-lg p-6 mb-4 shadow items-center">
                     <Image source={imageSource} style={mainStyles.categoryIcon} />
                     <Text className={`text-3xl font-bold ${isNegative ? "text-red-500" : "text-green-500"} mb-2`}>
-                        {transaction.amount}
+                        {parseAmount}
                     </Text>
                     <Text className="text-gray-600">Lúc {transaction.time || ""} ngày {transaction.date}</Text>
                 </View>

@@ -52,7 +52,7 @@ const SelectionGroup: React.FC<SelectionGroupProps> = ({ label, options, selecte
                 <TouchableOpacity
                     key={option}
                     onPress={() => onSelect(option)}
-                    className={`mr-2 mb-2 px-4 py-3 rounded-xl ${selected === option ? 'bg-green-600' : 'bg-gray-200'
+                    className={`mr-2 mb-2 px-4 py-3 rounded-xl ${selected === option ? 'bg-blue-600' : 'bg-gray-200'
                         }`}
                 >
                     <Text className={`font-medium ${selected === option ? 'text-white' : 'text-gray-800'}`}>{option}</Text>

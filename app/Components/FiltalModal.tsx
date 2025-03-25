@@ -31,7 +31,7 @@ const FilterOption = ({
                     key={option}
                     className={`mr-2 mb-2 p-2 rounded-full border ${selected === option
                         ? isCategory
-                            ? 'bg-green-500 border-green-500'
+                            ? 'bg-blue-500 border-blue-500'
                             : 'bg-blue-100'
                         : 'bg-white border-gray-300'
                         }`}
@@ -104,7 +104,7 @@ const FilterModal = ({
                         <TouchableOpacity className="flex-1 p-3 bg-gray-200 rounded-lg mr-2" onPress={onReset}>
                             <Text className="text-center font-medium">Đặt lại</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity className="flex-1 p-3 bg-green-500 rounded-lg" onPress={onClose}>
+                        <TouchableOpacity className="flex-1 p-3 bg-orange-500 rounded-lg" onPress={onClose}>
                             <Text className="text-white text-center font-medium">Áp dụng</Text>
                         </TouchableOpacity>
                     </View>

@@ -9,7 +9,7 @@ import TransactionItem from '@/app/Components/TransactionItem';
 import EmptyResults from '@/app/Components/EmptyResults';
 import FilterModal from '@/app/Components/FiltalModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { transactions } from '@/app/utils/Transactions';
+import { transactions as mockTransactions } from '@/app/utils/Transactions';
 import { HeaderSearch } from '@/app/Components/Header';
 import { normalizeDate } from '@/app/utils/normalizeDate';
 
@@ -27,7 +27,7 @@ const SearchScreen = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setTransactions(transactions);
+      setTransactions(mockTransactions);
       setIsLoading(false);
     }, 800);
     return () => clearTimeout(timer);
@@ -48,7 +48,6 @@ const SearchScreen = () => {
     if (!transactions.length) return [];
 
     const queryLower = searchQuery.trim().toLowerCase();
-    const parseAmount = (amount: string) => parseInt(amount.replace(/\D/g, '')) || 0;
 
     return transactions
       .filter(({ description = '', category = '', date = '' }) =>
@@ -56,8 +55,8 @@ const SearchScreen = () => {
         (selectedCategory === "Tất cả" || category === selectedCategory)
       )
       .sort((a, b) => {
-        const amountA = parseAmount(a.amount);
-        const amountB = parseAmount(b.amount);
+        const amountA = a.amount;  // Không cần parse vì amount đã là number
+        const amountB = b.amount;  // Không cần parse vì amount đã là number
         const dateA = Date.parse(normalizeDate(a.date));
         const dateB = Date.parse(normalizeDate(b.date));
 
@@ -67,7 +66,6 @@ const SearchScreen = () => {
               dateA - dateB;
       });
   }, [transactions, searchQuery, selectedCategory, selectedSort]);
-
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <HeaderSearch onBack={navigation.goBack} title="Tìm kiếm giao dịch" />

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { View, TextInput, TouchableOpacity, Pressable } from "react-native";
+import { View, TextInput, TouchableOpacity, Pressable, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 interface SearchBarProps {
@@ -44,8 +44,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, setSearchQuery, onFi
                 )}
             </Pressable>
 
-            <TouchableOpacity className="p-2 ml-2 rounded-lg bg-green-500" onPress={onFilterPress} activeOpacity={0.7}>
-                <Ionicons name="options-outline" size={25} color="white" />
+            <TouchableOpacity className="p-3 ml-3 rounded-lg bg-gray-200" onPress={onFilterPress} activeOpacity={0.7}>
+                <Image source={require("@/assets/icons/filter.png")}
+                    style={{ width: 25, height: 25 }} />
             </TouchableOpacity>
         </View>
     );

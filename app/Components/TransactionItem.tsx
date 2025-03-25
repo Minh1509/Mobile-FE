@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { ITransaction } from '@/app/interface/Transaction';
 import { getCategoryIcon } from '../utils/GetCategoryIcon';
+import VNDFormat from '../utils/MoneyParse';
 
 interface TransactionItemProps {
     transaction: ITransaction;
@@ -12,6 +13,7 @@ interface TransactionItemProps {
 const TransactionItem = ({ transaction, onPress }: TransactionItemProps) => {
     const { imageSource } = useMemo(() => getCategoryIcon(transaction.category), [transaction.category]);
     const handlePress = useCallback(() => onPress(transaction), [transaction, onPress]);
+    const parseAmount = VNDFormat(transaction.amount)
 
     return (
         <TouchableOpacity
@@ -23,7 +25,7 @@ const TransactionItem = ({ transaction, onPress }: TransactionItemProps) => {
             <View className="flex-row justify-between items-center mb-3">
                 <Text className="text-base font-medium text-gray-600">{transaction.date}</Text>
                 <Text className={`${transaction.amount < 0 ? 'text-red-500' : 'text-green-500'} text-lg font-bold`}>
-                    {transaction.amount}
+                    {parseAmount}
                 </Text>
             </View>
 
@@ -34,14 +36,11 @@ const TransactionItem = ({ transaction, onPress }: TransactionItemProps) => {
                 </View>
 
                 <Text className="text-lg font-semibold text-gray-800 flex-1">{transaction.category}</Text>
-                <View className="flex-row justify-end items-center mt-3">
+                <View className="flex-row justify-end items-center">
                     <Text className="text-sm text-blue-600 font-medium">Xem chi tiết</Text>
                     <Ionicons name="chevron-forward" size={16} color="#2563eb" />
                 </View>
             </View>
-
-
-
         </TouchableOpacity>
     );
 };
