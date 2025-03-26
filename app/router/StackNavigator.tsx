@@ -14,6 +14,7 @@ import CategoryTransactionsScreen from "../screens/TransactionScreen/CategoryTra
 import ExpenseScreen from "../screens/Expense/ExpenseScreen";
 import IncomeScreen from "../screens/Income/IncomeScreen";
 import BudgetScreen from "../screens/Budget/BudgetScreen";
+import UtilityScreen from "../screens/UtilityScreen/UtilityScreen";
 
 const Stack = createStackNavigator<RootStackParamList>();
 

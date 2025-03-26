@@ -19,11 +19,18 @@ import { Image } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import ExpenseComponentV2 from "@/app/Components/ExpenseComponentV2";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { RootStackParamList } from "@/app/Types/types";
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
+import VNDFormat from "@/app/utils/MoneyParse";
+
+type ExpenseScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+
 const ExpenseScreen = () => {
   const [money, setMoney] = useState("");
   const [note, setNote] = useState("");
   const [category, setCategory] = useState("Chọn loại");
-  const [location, setLocation] = useState("Chọn địa điểm");
+  const [location, setLocation] = useState("");
   const [date, setDate] = useState(new Date());
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
@@ -37,9 +44,9 @@ const ExpenseScreen = () => {
 
   const [imageUri, setImageUri] = useState<string | null>(null);
 
-  const categories = ["Ăn uống", "Mua sắm", "Di chuyển", "Hóa đơn", "Khác"];
-  const locations = ["Nhà riêng", "Công ty", "Trung tâm thương mại", "Khác"];
-
+  const categories = ["Ăn uống", "Mua sắm", "Di chuyển", "Tiền điện", "Tiền nước", "Học tập", "Giải trí", "Thuê nhà", "Internet", "Khác"];
+  // const locations = ["Nhà riêng", "Công ty", "Trung tâm thương mại", "Khác"];
+  
   const onChangeDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowPicker(false);
     if (event.type === "set" && selectedDate) {
@@ -97,13 +104,27 @@ const ExpenseScreen = () => {
       setImageUri(result.assets[0].uri);
     }
   };
+
+  const handleMoneyChange = (text: string) => {
+    // Loại bỏ tất cả ký tự không phải số
+    const numericValue = text.replace(/[^0-9]/g, "");
+
+    // Nếu có giá trị nhập vào, format lại số tiền
+    if (numericValue) {
+      setMoney(VNDFormat(Number(numericValue)));
+    } else {
+      setMoney(""); // Nếu người dùng xóa hết thì trả về chuỗi rỗng
+    }
+  };
+
+  const navigation = useNavigation<ExpenseScreenNavigationProp>();
   
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scrollContainer}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={navigation.goBack}>
             <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
           </TouchableOpacity>
           <Text style={styles.headerText}>Thêm Chi Tiêu</Text>
@@ -118,7 +139,7 @@ const ExpenseScreen = () => {
           placeholder="Nhập số tiền"
           keyboardType="numeric"
           value={money}
-          onChangeText={setMoney}
+          onChangeText={handleMoneyChange}
         />
 
         {showDetails && (
@@ -137,10 +158,11 @@ const ExpenseScreen = () => {
                 value={description}
                 onChangeText={setDescription}
               />
-              <ExpenseComponent
-                icon="map-marker"
-                text={location}
-                onPress={() => setShowLocationModal(true)}
+              <TextInput
+                style={styles.inputDescription}
+                placeholder="Nhập địa điểm"
+                value={location}
+                onChangeText={setLocation}
               />
               <ExpenseComponent
                 icon="credit-card"
@@ -237,7 +259,7 @@ const ExpenseScreen = () => {
         </Modal>
 
         {/* Modal Chọn Địa Điểm */}
-        <Modal
+        {/* <Modal
           visible={showLocationModal}
           transparent={true}
           animationType="slide"
@@ -263,7 +285,7 @@ const ExpenseScreen = () => {
               />
             </View>
           </View>
-        </Modal>
+        </Modal> */}
 
         {/* Modal Chọn Phương Thức Thanh Toán */}
         <Modal
