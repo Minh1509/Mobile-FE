@@ -67,8 +67,8 @@ const SearchScreen = () => {
       });
   }, [transactions, searchQuery, selectedCategory, selectedSort]);
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      <HeaderSearch onBack={navigation.goBack} title="Tìm kiếm giao dịch" />
+    <SafeAreaView className="mt-2 flex-1 bg-gray-50">
+      {/* <HeaderSearch onBack={navigation.goBack} title="Tìm kiếm giao dịch" /> */}
 
       <View className="px-4 py-3 bg-gray border-b border-gray-200">
         <SearchBar searchQuery={searchQuery} setSearchQuery={handleSearch} onFilterPress={() => setFilterVisible(true)} />
