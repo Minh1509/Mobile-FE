@@ -3,9 +3,13 @@ import { View, ScrollView, TouchableOpacity, Text, Appearance } from "react-nati
 import { Avatar, Switch, Button } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "@/app/Types/types";
+import { StackNavigationProp } from '@react-navigation/stack';
+
+type  ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 const ProfileScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<ProfileScreenNavigationProp>();
 
   // Lấy chế độ tối từ hệ thống
   const [darkMode, setDarkMode] = useState(Appearance.getColorScheme() === "dark");
@@ -39,7 +43,7 @@ const ProfileScreen: React.FC = () => {
       </View>
 
       {/* Các mục cài đặt */}
-      <TouchableOpacity onPress={() => {}}>
+      <TouchableOpacity onPress={() => navigation.navigate("ProfileEdit")}>
         <SettingItem icon="user" title="Tài khoản" darkMode={darkMode} />
       </TouchableOpacity>
 

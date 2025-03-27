@@ -15,6 +15,7 @@ import ExpenseScreen from "../screens/Expense/ExpenseScreen";
 import IncomeScreen from "../screens/Income/IncomeScreen";
 import BudgetScreen from "../screens/Budget/BudgetScreen";
 import UtilityScreen from "../screens/UtilityScreen/UtilityScreen";
+import ProfileEditScreen from "../screens/Profile/ProfileEditScreen";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -46,6 +47,7 @@ export default function StackNavigator() {
       <Stack.Screen name="AddExpense" component={ExpenseScreen} options={{ headerShown: false }} />
       <Stack.Screen name="AddIncome" component={IncomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="AddBudget" component={BudgetScreen} options={{ headerShown: false }}/>
+      <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} options={{ headerShown: false }}/>
     </Stack.Navigator>
 
   );
