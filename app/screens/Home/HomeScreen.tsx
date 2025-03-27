@@ -103,8 +103,9 @@ const HomeScreen = () => {
             onPress={() => handleCategoryPress(item.category)}
         >
             <View style={styles.iconContainer}>
-                <Image source={item.imageSource} style={styles.categoryImage} /> {/* Sử dụng Image thay vì Ionicons */}
+                <Image source={item.imageSource} style={styles.categoryImage} />
             </View>
+            {/* Đảm bảo chuỗi văn bản được bọc trong <Text> */}
             <Text style={styles.expenseCategory}>{item.category}</Text>
             <Text
                 style={[

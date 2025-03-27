@@ -34,9 +34,11 @@ const LoginScreen: React.FC = () => {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             console.log('Đăng nhập thành công cho email:', email);
             Alert.alert('Thành công', 'Đăng nhập thành công!');
-            // Điều hướng đến màn hình chính sau khi đăng nhập (ví dụ: 'Home')
-            // navigation.navigate('Home'); // Uncomment và thay 'Home' bằng route của bạn
-            navigation.navigate('Tabs');
+            
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Tabs' }], // Thay 'Tabs' bằng tên route của màn hình chính
+            });
 
         } catch (error: any) {
             console.error('Lỗi đăng nhập:', error.message);

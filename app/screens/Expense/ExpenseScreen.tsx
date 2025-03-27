@@ -10,7 +10,7 @@ import {
   FlatList,
   Platform,
   StyleSheet,
-  
+
 } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import ExpenseComponent from "@/app/Components/ExpenseComponent";
@@ -46,14 +46,14 @@ const ExpenseScreen = () => {
 
   const categories = ["Ăn uống", "Mua sắm", "Di chuyển", "Tiền điện", "Tiền nước", "Học tập", "Giải trí", "Thuê nhà", "Internet", "Khác"];
   // const locations = ["Nhà riêng", "Công ty", "Trung tâm thương mại", "Khác"];
-  
+
   const onChangeDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowPicker(false);
     if (event.type === "set" && selectedDate) {
       setDate(selectedDate);
     }
   };
-  
+
   const onChangeTime = (event: DateTimePickerEvent, selectedTime?: Date) => {
     setShowPicker(false);
     if (event.type === "set" && selectedTime) {
@@ -62,17 +62,17 @@ const ExpenseScreen = () => {
       setDate(newDate);
     }
   };
-  
+
   const showDatePicker = () => {
     setPickerMode("date");
     setShowPicker(true);
   };
-  
+
   const showTimePicker = () => {
     setPickerMode("time");
     setShowPicker(true);
   };
-  
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -80,7 +80,7 @@ const ExpenseScreen = () => {
       aspect: [4, 3],
       quality: 1,
     });
-  
+
     if (!result.canceled) {
       setImageUri(result.assets[0].uri);
     }
@@ -92,14 +92,14 @@ const ExpenseScreen = () => {
       alert("Bạn cần cấp quyền để sử dụng camera");
       return;
     }
-  
+
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-  
+
     if (!result.canceled) {
       setImageUri(result.assets[0].uri);
     }
@@ -118,7 +118,7 @@ const ExpenseScreen = () => {
   };
 
   const navigation = useNavigation<ExpenseScreenNavigationProp>();
-  
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scrollContainer}>
@@ -187,7 +187,7 @@ const ExpenseScreen = () => {
               <ExpenseComponent
                 icon="pencil"
                 text={note || "Ghi Chú"}
-                onPress={() => {}}
+                onPress={() => { }}
               />
             </View>
 
@@ -203,11 +203,11 @@ const ExpenseScreen = () => {
               {imageUri && <Image source={{ uri: imageUri }} className="w-full h-60 mt-3 rounded-lg object-cover" />}
               <View className="flex-row items-center justify-between mt-2">
                 <ExpenseComponentV2 icon="image" text="Chọn ảnh" onPress={pickImage} />
-                <View className="w-px h-10 bg-gray-300" /> {/* Đường kẻ phân cách */}
+                <View className="w-px h-10 bg-gray-300" />
                 <ExpenseComponentV2 icon="camera" text="Chụp ảnh" onPress={takePhoto} />
               </View>
             </View>
-          </>  
+          </>
         )}
 
         {/* Nút ẩn/hiện chi tiết */}
