@@ -17,7 +17,7 @@ import ExpenseComponent from "@/app/Components/ExpenseComponent";
 import { RootStackParamList } from "@/app/Types/types";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import VNDFormat from "@/app/utils/MoneyParse";
+import { normalizeDate } from "@/app/utils/normalizeDate";
 
 type IncomeScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -36,18 +36,6 @@ const IncomeScreen = () => {
     setShowPicker(false);
     if (event.type === "set" && selectedDate) {
       setDate(selectedDate);
-    }
-  };
-
-  const handleMoneyChange = (text: string) => {
-    // Loại bỏ tất cả ký tự không phải số
-    const numericValue = text.replace(/[^0-9]/g, "");
-
-    // Nếu có giá trị nhập vào, format lại số tiền
-    if (numericValue) {
-      setMoney(VNDFormat(Number(numericValue)));
-    } else {
-      setMoney(""); // Nếu người dùng xóa hết thì trả về chuỗi rỗng
     }
   };
 
@@ -73,7 +61,7 @@ const IncomeScreen = () => {
           placeholder="Nhập số tiền"
           keyboardType="numeric"
           value={money}
-          onChangeText={handleMoneyChange}
+          onChangeText={setMoney}
         />
 
         {/* Nút ẩn/hiện chi tiết */}
@@ -94,7 +82,7 @@ const IncomeScreen = () => {
               text={category}
               onPress={() => setShowCategoryModal(true)}
             />
-            <ExpenseComponent icon="calendar" text={date.toLocaleDateString()} onPress={() => setShowPicker(true)} />
+            <ExpenseComponent icon="calendar" text={normalizeDate(date.toLocaleDateString("vi-VN"))} onPress={() => setShowPicker(true)} />
             <ExpenseComponent icon="pencil" text={note || "Ghi Chú"} onPress={() => {}} />
           </View>
         )}

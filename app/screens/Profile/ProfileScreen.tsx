@@ -43,7 +43,7 @@ const ProfileScreen: React.FC = () => {
       </View>
 
       {/* Các mục cài đặt */}
-      <TouchableOpacity onPress={() => navigation.navigate("ProfileEdit")}>
+      <TouchableOpacity onPress={() => {}}>
         <SettingItem icon="user" title="Tài khoản" darkMode={darkMode} />
       </TouchableOpacity>
 

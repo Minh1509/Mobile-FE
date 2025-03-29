@@ -22,7 +22,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { RootStackParamList } from "@/app/Types/types";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import VNDFormat from "@/app/utils/MoneyParse";
+import { normalizeDate } from "@/app/utils/normalizeDate";
 
 type ExpenseScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -105,18 +105,6 @@ const ExpenseScreen = () => {
     }
   };
 
-  const handleMoneyChange = (text: string) => {
-    // Loại bỏ tất cả ký tự không phải số
-    const numericValue = text.replace(/[^0-9]/g, "");
-
-    // Nếu có giá trị nhập vào, format lại số tiền
-    if (numericValue) {
-      setMoney(VNDFormat(Number(numericValue)));
-    } else {
-      setMoney(""); // Nếu người dùng xóa hết thì trả về chuỗi rỗng
-    }
-  };
-
   const navigation = useNavigation<ExpenseScreenNavigationProp>();
   
   return (
@@ -139,7 +127,7 @@ const ExpenseScreen = () => {
           placeholder="Nhập số tiền"
           keyboardType="numeric"
           value={money}
-          onChangeText={handleMoneyChange}
+          onChangeText={setMoney}
         />
 
         {showDetails && (
@@ -171,7 +159,7 @@ const ExpenseScreen = () => {
               />
               <ExpenseComponent
                 icon="calendar"
-                text={date.toLocaleDateString()}
+                text={normalizeDate(date.toLocaleDateString("vi-VN"))}
                 onPress={showDatePicker}
               />
 
