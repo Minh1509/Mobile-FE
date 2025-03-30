@@ -1,17 +1,10 @@
+// src/screens/LoginScreen.tsx
 import React, { useState } from 'react';
-import {
-    View,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    Image,
-    Alert,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from "../../../Types/types";
 import styles from './styles';
-import { auth } from '@/firebase_config.env'; // Import auth từ firebase config
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { handleAuthError, loginWithEmailPassword } from '@/app/services/auth.service';
 
 const LoginScreen: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -20,47 +13,30 @@ const LoginScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
     const handleLogin = async () => {
-        // Validation cơ bản
         if (!email || !password) {
-            console.log('Validation failed: Missing email or password');
             Alert.alert('Lỗi', 'Vui lòng điền đầy đủ email và mật khẩu');
             return;
         }
 
         setLoading(true);
 
-        try {
-            // Đăng nhập với Firebase
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        // Gọi hàm login từ authService
+        const { user, error } = await loginWithEmailPassword(email, password);
+
+        if (user) {
             console.log('Đăng nhập thành công cho email:', email);
             Alert.alert('Thành công', 'Đăng nhập thành công!');
-            
             navigation.reset({
                 index: 0,
-                routes: [{ name: 'Tabs' }], // Thay 'Tabs' bằng tên route của màn hình chính
+                routes: [{ name: 'Tabs' }],
             });
-
-        } catch (error: any) {
-            console.error('Lỗi đăng nhập:', error.message);
-            switch (error.code) {
-                case 'auth/invalid-email':
-                    Alert.alert('Lỗi', 'Email không hợp lệ');
-                    break;
-                case 'auth/user-not-found':
-                    Alert.alert('Lỗi', 'Không tìm thấy người dùng với email này');
-                    break;
-                case 'auth/wrong-password':
-                    Alert.alert('Lỗi', 'Mật khẩu không đúng');
-                    break;
-                case 'auth/too-many-requests':
-                    Alert.alert('Lỗi', 'Quá nhiều yêu cầu, vui lòng thử lại sau');
-                    break;
-                default:
-                    Alert.alert('Lỗi', 'Đã có lỗi xảy ra: ' + error.message);
-            }
-        } finally {
-            setLoading(false);
+        } else {
+            // Xử lý lỗi từ Firebase
+            const errorMessage = handleAuthError(error);
+            Alert.alert('Lỗi', errorMessage);
         }
+
+        setLoading(false);
     };
 
     return (

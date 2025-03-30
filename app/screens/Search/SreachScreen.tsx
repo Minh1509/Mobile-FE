@@ -10,7 +10,6 @@ import EmptyResults from '@/app/Components/EmptyResults';
 import FilterModal from '@/app/Components/FiltalModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { transactions as mockTransactions } from '@/app/utils/Transactions';
-import { HeaderSearch } from '@/app/Components/Header';
 import { normalizeDate } from '@/app/utils/normalizeDate';
 
 const CATEGORIES = ["Tất cả", "Di chuyển", "Ăn uống", "Tiền điện", "Tiền nước", "Học tập", "Giải trí", "Thuê nhà", "Thu nhập", "Internet"];
