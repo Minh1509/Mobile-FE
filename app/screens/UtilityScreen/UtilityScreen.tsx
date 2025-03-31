@@ -1,58 +1,62 @@
-// File: UtilitiesScreen.js
+// File: UtilityScreen.js
 
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from "../../Types/types";
+import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
+import {Ionicons} from '@expo/vector-icons';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '@/app/Types/types'
 
 // Định nghĩa kiểu cho icon từ Ionicons
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
-// Định nghĩa kiểu navigation 
-type UtilityScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+// Định nghĩa kiểu cho navigation
+type UtilityScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Utility'>;
 
 // Định nghĩa interface cho UtilityItem, sử dụng IoniconsName cho icon
 interface UtilityItem {
     id: string;
     title: string;
-    icon: IoniconsName; // Sử dụng kiểu IoniconsName thay vì string
+    icon: IoniconsName;
 }
 
 // Dữ liệu giả lập cho danh sách tiện ích
 const utilities: UtilityItem[] = [
-    { id: '1', title: 'Biểu đồ thu chi', icon: 'pie-chart' },
-    { id: '2', title: 'Biểu đồ phân tích theo danh mục', icon: 'git-network' },
-    { id: '3', title: 'Biểu đồ xu hướng', icon: 'bar-chart' },
-    { id: '4', title: 'Biểu đồ so sánh thu chi', icon: 'stats-chart' },
-    { id: '5', title: 'Thêm chi tiêu', icon: 'cash-outline' },
-    { id: '6', title: 'Thêm thu nhập', icon: 'wallet-outline' },
-    { id: '7', title: 'Thiết lập ngân sách', icon: 'calculator-outline' },
+    {id: 'IncomeAndExpenditureChart', title: 'Biểu đồ thu chi', icon: 'pie-chart'},
+    {id: '2', title: 'Biểu đồ phân tích theo danh mục', icon: 'git-network'},
+    {id: '3', title: 'Biểu đồ xu hướng', icon: 'bar-chart'},
+    {id: '4', title: 'Biểu đồ so sánh thu chi', icon: 'stats-chart'},
+    {id: 'AddExpense', title: 'Thêm chi tiêu', icon: 'cash-outline'},
+    {id: 'AddIncome', title: 'Thêm thu nhập', icon: 'wallet-outline'},
+    {id: 'AddBudget', title: 'Thiết lập ngân sách', icon: 'calculator-outline'},
 ];
 
 const UtilityScreen = () => {
-    const navigation = useNavigation<UtilityScreenNavigationProp>();
+    const navigation = useNavigation<UtilityScreenNavigationProp>(); // Khởi tạo navigation
 
-    // Thêm xử lý sự kiện khi nhấn vào từng tiện ích
-    const handlePress = (title: string) => {
-        if (title === 'Thêm chi tiêu') {
+    // Hàm xử lý khi nhấn vào một mục
+    const handleItemPress = (id: string) => {
+        if (id === 'IncomeAndExpenditureChart') {
+            navigation.navigate('IncomeAndExpenditureChart');
+        } else if (id === 'AddExpense') {
             navigation.navigate('AddExpense');
-        } else if (title === 'Thêm thu nhập') {
+        } else if (id === 'AddIncome') {
             navigation.navigate('AddIncome');
-        } else if (title === 'Thiết lập ngân sách') {
+        } else if (id === 'AddBudget') {
             navigation.navigate('AddBudget');
+        } else {
+            console.log('Chức năng đang được phát triển');
         }
     };
 
     // Hàm render từng mục trong danh sách
-    const renderItem = ({ item }: { item: UtilityItem }) => (
-        <TouchableOpacity style={styles.itemContainer} onPress={() => handlePress(item.title)}>
+    const renderItem = ({item}: { item: UtilityItem }) => (
+        <TouchableOpacity style={styles.itemContainer} onPress={() => handleItemPress(item.id)}>
             <View style={styles.iconContainer}>
-                <Ionicons name={item.icon} size={24} color="#FF6347" />
+                <Ionicons name={item.icon} size={24} color="#FF6347"/>
             </View>
             <Text style={styles.itemText}>{item.title}</Text>
-            <Ionicons name="chevron-forward" size={24} color="#000" />
+            <Ionicons name="chevron-forward" size={24} color="#000"/>
         </TouchableOpacity>
     );
 
@@ -97,7 +101,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         elevation: 2,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.1,
         shadowRadius: 4,
     },

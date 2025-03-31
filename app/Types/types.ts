@@ -4,12 +4,14 @@ export type RootStackParamList = {
   Tabs: undefined;
   Login: undefined;
   Register: undefined;
+  Utility: undefined; // Thêm Utility
   TransactionDetail: { transaction: ITransaction };
   EditTransaction: { transaction: ITransaction };
   CategoryTransactions: {
     category: string, month: number;
     year: number;
   };
+  IncomeAndExpenditureChart: undefined;
   AddExpense: undefined;
   AddIncome: undefined;
   AddBudget: undefined;

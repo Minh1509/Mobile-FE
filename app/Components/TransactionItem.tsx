@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { ITransaction, TransactionType } from '@/app/interface/Transaction';
 import { getCategoryIcon } from '../utils/GetCategoryIcon';
-import VNDFormat from '../utils/MoneyParse';
+import { VNDFormat } from '../utils/MoneyParse';
 
 interface TransactionItemProps {
     transaction: ITransaction;

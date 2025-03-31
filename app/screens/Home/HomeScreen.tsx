@@ -6,7 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '@/app/Types/types';
 import { useTransactions } from '@/app/hooks/useTransactions';
 import { ITransaction, TransactionType } from '@/app/interface/Transaction';
-import VNDFormat from '@/app/utils/MoneyParse';
+import { VNDFormat } from '@/app/utils/MoneyParse';
 import { getCategoryIcon } from '@/app/utils/GetCategoryIcon';
 
 // Định nghĩa kiểu cho navigation

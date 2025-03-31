@@ -2,5 +2,9 @@
     return amount.toLocaleString('vi-VN') + ' VND';
 };
 
-export default VNDFormat;
+const VNDKFormat = (amount: number) => {
+    return (amount / 1000).toLocaleString('vi-VN') + 'K VND';
+};
+
+export { VNDFormat, VNDKFormat };
 
