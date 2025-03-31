@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   View,
@@ -10,26 +10,31 @@ import {
   FlatList,
   Platform,
   StyleSheet,
-
+  Alert,
 } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import ExpenseComponent from "@/app/Components/ExpenseComponent";
-import { launchCamera, launchImageLibrary } from "react-native-image-picker";
-import { Image } from "react-native";
-import * as ImagePicker from 'expo-image-picker';
 import ExpenseComponentV2 from "@/app/Components/ExpenseComponentV2";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { RootStackParamList } from "@/app/Types/types";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import VNDFormat from "@/app/utils/MoneyParse";
+import * as ImagePicker from 'expo-image-picker';
+import { Image } from "react-native";
+import { addIncome } from "@/app/services/firestore.service";
+import { ITransaction, PayMethod, TransactionType } from "@/app/interface/Transaction";
+import { useUserAuth } from "@/app/hooks/userAuth";
+import { getCategories } from "@/app/services/firestore.service";
+import { ICategory } from "@/app/interface/Category";
+import { formatDate, formatTime } from "@/app/utils/normalizeDate";
 
 type ExpenseScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 const ExpenseScreen = () => {
   const [money, setMoney] = useState("");
   const [note, setNote] = useState("");
-  const [category, setCategory] = useState("Chọn loại");
+  const [categoryId, setCategoryId] = useState<string>("");
+  const [categoryName, setCategoryName] = useState<string>("Chọn loại");
   const [location, setLocation] = useState("");
   const [date, setDate] = useState(new Date());
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -40,12 +45,95 @@ const ExpenseScreen = () => {
   const [description, setDescription] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-
-
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [categories, setCategories] = useState<ICategory[]>([]); // Thay đổi kiểu thành string[]
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
-  const categories = ["Lương", "Thưởng", "Đầu tư", "Khác"];
-  // const locations = ["Nhà riêng", "Công ty", "Trung tâm thương mại", "Khác"];
+  const paymentMethods = ["Tiền mặt", "Thẻ tín dụng", "Ví điện tử"];
+  const navigation = useNavigation<ExpenseScreenNavigationProp>();
+  const { userId, loading } = useUserAuth();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        const fetchedCategories = await getCategories();
+        console.log("Danh mục:", fetchedCategories); // Log để kiểm tra
+        setCategories(fetchedCategories); // Ép kiểu thành string[]
+      } catch (error) {
+        console.error("Lỗi khi lấy danh mục:", error);
+        Alert.alert("Lỗi", "Không thể lấy danh sách danh mục. Vui lòng thử lại.");
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const mapPaymentMethodToEnum = (method: string): PayMethod => {
+    switch (method) {
+      case "Tiền mặt":
+        return PayMethod.CASH;
+      case "Thẻ tín dụng":
+        return PayMethod.CARD;
+      case "Ví điện tử":
+        return PayMethod.BANK_TRANSFER;
+      default:
+        return PayMethod.CASH;
+    }
+  };
+
+  const formatDisplayTime = (date: Date): string => {
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+
+  const handleSave = async () => {
+    try {
+      if (loading) {
+        Alert.alert("Đang tải", "Vui lòng chờ trong giây lát...");
+        return;
+      }
+
+      if (!userId) {
+        Alert.alert("Lỗi", "Bạn cần đăng nhập để thêm thu nhập.");
+        return;
+      }
+
+      if (!money || parseFloat(money) <= 0) {
+        Alert.alert("Lỗi", "Vui lòng nhập số tiền hợp lệ (lớn hơn 0).");
+        return;
+      }
+
+      if (!categoryId) {
+        Alert.alert("Lỗi", "Vui lòng chọn loại thu nhập.");
+        return;
+      }
+
+      const incomeData: Omit<ITransaction, 'id' | 'type' | 'createdAt' | 'updatedAt'> = {
+        userId: userId,
+        category: categoryName, // Lưu categoryId (ở đây là tên danh mục)
+        date: formatDate(date),
+        time: formatTime(date),
+        amount: parseFloat(money),
+        description,
+        paymentMethod: mapPaymentMethodToEnum(paymentMethod),
+        note,
+        location,
+        image: imageUri || "",
+      };
+
+      const transactionId = await addIncome(incomeData);
+
+      Alert.alert("Thành công", "Thu nhập đã được thêm thành công!");
+      navigation.goBack();
+    } catch (error) {
+      console.error("Lỗi khi lưu thu nhập:", error);
+      Alert.alert("Lỗi", "Không thể thêm thu nhập. Vui lòng thử lại.");
+    }
+  };
 
   const onChangeDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowPicker(false);
@@ -58,7 +146,7 @@ const ExpenseScreen = () => {
     setShowPicker(false);
     if (event.type === "set" && selectedTime) {
       const newDate = new Date(date);
-      newDate.setHours(selectedTime.getHours(), selectedTime.getMinutes());
+      newDate.setHours(selectedTime.getHours(), selectedTime.getMinutes(), 0);
       setDate(newDate);
     }
   };
@@ -105,24 +193,29 @@ const ExpenseScreen = () => {
     }
   };
 
-
-  const navigation = useNavigation<ExpenseScreenNavigationProp>();
+  if (loading || categoriesLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <Text>Đang tải...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scrollContainer}>
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={navigation.goBack}>
             <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
           </TouchableOpacity>
           <Text style={styles.headerText}>Thêm Thu Nhập</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleSave}>
             <Text style={styles.saveText}>Lưu</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Input số tiền */}
         <TextInput
           style={styles.input}
           placeholder="Nhập số tiền"
@@ -133,14 +226,12 @@ const ExpenseScreen = () => {
 
         {showDetails && (
           <>
-            {/* Các mục chi tiêu */}
             <View style={styles.card}>
               <ExpenseComponent
                 icon="help-circle-outline"
-                text={category}
+                text={categoryName}
                 onPress={() => setShowCategoryModal(true)}
               />
-              {/* Ô nhập mô tả */}
               <TextInput
                 style={styles.inputDescription}
                 placeholder="Nhập mô tả"
@@ -160,27 +251,21 @@ const ExpenseScreen = () => {
               />
               <ExpenseComponent
                 icon="calendar"
-                text={date.toLocaleDateString()}
+                text={formatDate(date)}
                 onPress={showDatePicker}
               />
-
               <ExpenseComponent
                 icon="clock-outline"
-                text={date.toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                })}
+                text={formatDisplayTime(date)}
                 onPress={showTimePicker}
               />
               <ExpenseComponent
                 icon="pencil"
                 text={note || "Ghi Chú"}
-                onPress={() => { }}
+                onPress={() => {}}
               />
             </View>
 
-            {/* Input ghi chú */}
             <TextInput
               className="bg-white p-4 text-base rounded-lg my-3"
               placeholder="Nhập ghi chú"
@@ -199,7 +284,6 @@ const ExpenseScreen = () => {
           </>
         )}
 
-        {/* Nút ẩn/hiện chi tiết */}
         <TouchableOpacity
           style={styles.toggleButton}
           onPress={() => setShowDetails(!showDetails)}
@@ -218,7 +302,6 @@ const ExpenseScreen = () => {
           />
         )}
 
-        {/* Modal Chọn Loại Chi Tiêu */}
         <Modal
           visible={showCategoryModal}
           transparent={true}
@@ -230,16 +313,17 @@ const ExpenseScreen = () => {
               <Text style={styles.modalTitle}>Chọn loại chi tiêu</Text>
               <FlatList
                 data={categories}
-                keyExtractor={(item) => item}
+                keyExtractor={(item, index) => index.toString()} // Sử dụng index làm key
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     style={styles.listItem}
                     onPress={() => {
-                      setCategory(item);
+                      setCategoryId(item.id); // Lưu tên danh mục làm categoryId
+                      setCategoryName(item.name);
                       setShowCategoryModal(false);
                     }}
                   >
-                    <Text>{String(item)}</Text>
+                    <Text>{item.name}</Text> {/* Hiển thị trực tiếp item vì item là string */}
                   </TouchableOpacity>
                 )}
               />
@@ -257,7 +341,7 @@ const ExpenseScreen = () => {
             <View style={styles.modalContainer}>
               <Text style={styles.modalTitle}>Chọn phương thức thanh toán</Text>
               <FlatList
-                data={["Tiền mặt", "Thẻ tín dụng", "Ví điện tử"]}
+                data={paymentMethods}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
                   <TouchableOpacity
@@ -295,6 +379,5 @@ const styles = StyleSheet.create({
   listItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc' },
   inputDescription: { backgroundColor: "#f8f9fa", borderRadius: 10, padding: 10, fontSize: 16, color: "#333", marginVertical: 6, shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2, elevation: 2 },
 });
-
 
 export default ExpenseScreen;
