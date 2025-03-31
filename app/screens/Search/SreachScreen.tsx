@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -9,28 +9,19 @@ import TransactionItem from '@/app/Components/TransactionItem';
 import EmptyResults from '@/app/Components/EmptyResults';
 import FilterModal from '@/app/Components/FiltalModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { transactions as mockTransactions } from '@/app/utils/Transactions';
+import { useTransactions } from '@/app/hooks/useTransactions';
 import { normalizeDate } from '@/app/utils/normalizeDate';
 
-const CATEGORIES = ["Tất cả", "Di chuyển", "Ăn uống", "Tiền điện", "Tiền nước", "Học tập", "Giải trí", "Thuê nhà", "Thu nhập", "Internet"];
+const CATEGORIES = ["Tất cả", "Di chuyển", "Ăn uống", "Tiền điện", "Tiền nước", "Học tập", "Giải trí", "Thuê nhà", "Thu nhập", "Internet", "Lương", "Thưởng", "Đầu tư", "Khác"];
 const SORT_OPTIONS = ["Số tiền giảm dần", "Số tiền tăng dần", "Thời gian giảm dần", "Thời gian tăng dần"];
 
 const SearchScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'TransactionDetail'>>();
+  const { transactions, loading: isLoading } = useTransactions();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0]);
   const [selectedSort, setSelectedSort] = useState(SORT_OPTIONS[2]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [transactions, setTransactions] = useState<ITransaction[]>([]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setTransactions(mockTransactions);
-      setIsLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleSearch = useCallback((query: string) => setSearchQuery(query), []);
   const handleTransactionPress = useCallback((transaction: ITransaction) => {
@@ -54,8 +45,8 @@ const SearchScreen = () => {
         (selectedCategory === "Tất cả" || category === selectedCategory)
       )
       .sort((a, b) => {
-        const amountA = a.amount;  // Không cần parse vì amount đã là number
-        const amountB = b.amount;  // Không cần parse vì amount đã là number
+        const amountA = a.amount;
+        const amountB = b.amount;
         const dateA = Date.parse(normalizeDate(a.date));
         const dateB = Date.parse(normalizeDate(b.date));
 
@@ -65,10 +56,9 @@ const SearchScreen = () => {
               dateA - dateB;
       });
   }, [transactions, searchQuery, selectedCategory, selectedSort]);
+
   return (
     <SafeAreaView className="mt-2 flex-1 bg-gray-50">
-      {/* <HeaderSearch onBack={navigation.goBack} title="Tìm kiếm giao dịch" /> */}
-
       <View className="px-4 py-3 bg-gray border-b border-gray-200">
         <SearchBar searchQuery={searchQuery} setSearchQuery={handleSearch} onFilterPress={() => setFilterVisible(true)} />
       </View>

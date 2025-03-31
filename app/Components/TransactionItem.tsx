@@ -1,19 +1,23 @@
 import React, { useMemo, useCallback } from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
-import { ITransaction } from '@/app/interface/Transaction';
+import { ITransaction, TransactionType } from '@/app/interface/Transaction';
 import { getCategoryIcon } from '../utils/GetCategoryIcon';
 import VNDFormat from '../utils/MoneyParse';
 
 interface TransactionItemProps {
     transaction: ITransaction;
     onPress: (transaction: ITransaction) => void;
+    showSign?: boolean;
 }
 
-const TransactionItem = ({ transaction, onPress }: TransactionItemProps) => {
+const TransactionItem = ({ transaction, onPress, showSign = true }: TransactionItemProps) => {
     const { imageSource } = useMemo(() => getCategoryIcon(transaction.category), [transaction.category]);
     const handlePress = useCallback(() => onPress(transaction), [transaction, onPress]);
-    const parseAmount = VNDFormat(transaction.amount)
+
+    const sign = transaction.type === TransactionType.INCOME ? "+" : "-";
+    const amountColor = transaction.type === TransactionType.INCOME ? 'text-green-500' : 'text-red-500';
+    const formattedAmount = `${showSign ? sign : ''} ${VNDFormat(transaction.amount)}`;
 
     return (
         <TouchableOpacity
@@ -24,8 +28,8 @@ const TransactionItem = ({ transaction, onPress }: TransactionItemProps) => {
             {/* Ngày & Số tiền */}
             <View className="flex-row justify-between items-center mb-3">
                 <Text className="text-base font-medium text-gray-600">{transaction.date}</Text>
-                <Text className={`${transaction.amount < 0 ? 'text-red-500' : 'text-green-500'} text-lg font-bold`}>
-                    {parseAmount}
+                <Text className={`${amountColor} text-lg font-bold`}>
+                    {formattedAmount}
                 </Text>
             </View>
 

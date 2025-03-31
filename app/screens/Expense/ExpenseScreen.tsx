@@ -111,7 +111,7 @@ const ExpenseScreen = () => {
 
     // Nếu có giá trị nhập vào, format lại số tiền
     if (numericValue) {
-      setMoney(VNDFormat(Number(numericValue)));
+      setMoney(String(Number(numericValue)));
     } else {
       setMoney(""); // Nếu người dùng xóa hết thì trả về chuỗi rỗng
     }
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   scrollContainer: { flexGrow: 1, padding: 16 },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
   headerText: { fontSize: 18, fontWeight: "bold" },
-  saveText: { color: "#1E90FF", fontWeight: "bold" },
+  saveText: { color: "#1E90FF", fontWeight: "bold", fontSize: 18 },
   input: { backgroundColor: "#fff", padding: 16, fontSize: 18, borderRadius: 8, marginBottom: 12 },
   card: { backgroundColor: "#fff", borderRadius: 8, padding: 16, marginBottom: 12 },
   toggleButton: { backgroundColor: "#1E90FF", padding: 12, borderRadius: 8, alignItems: "center" },

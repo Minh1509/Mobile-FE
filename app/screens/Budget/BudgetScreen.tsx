@@ -45,7 +45,7 @@ const BudgetScreen = () => {
 
     // Nếu có giá trị nhập vào, format lại số tiền
     if (numericValue) {
-      setMoney(VNDFormat(Number(numericValue)));
+      setMoney(String(Number(numericValue)));
     } else {
       setMoney(""); // Nếu người dùng xóa hết thì trả về chuỗi rỗng
     }
@@ -95,7 +95,7 @@ const BudgetScreen = () => {
               onPress={() => setShowCategoryModal(true)}
             />
             <ExpenseComponent icon="calendar" text={date.toLocaleDateString()} onPress={() => setShowPicker(true)} />
-            <ExpenseComponent icon="pencil" text={note || "Ghi Chú"} onPress={() => {}} />
+            <ExpenseComponent icon="pencil" text={note || "Ghi Chú"} onPress={() => { }} />
           </View>
         )}
 
@@ -175,6 +175,7 @@ const styles = StyleSheet.create({
   saveText: {
     color: "#007bff",
     fontWeight: "bold",
+    fontSize: 18
   },
   input: {
     backgroundColor: "#fff",

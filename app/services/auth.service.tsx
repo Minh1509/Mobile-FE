@@ -9,6 +9,7 @@ export const loginWithEmailPassword = async (email: string, password: string) =>
         const user = userCredential.user;
         // Lưu UID của người dùng vào AsyncStorage
         await AsyncStorage.setItem('@user_id', user.uid);
+        console.log(user.uid);
         return { user, error: null };
     } catch (error: any) {
         return { user: null, error };

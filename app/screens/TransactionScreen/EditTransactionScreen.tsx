@@ -1,120 +1,451 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import React, { useState, useEffect } from "react";
+import {
+    SafeAreaView,
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    ScrollView,
+    Modal,
+    FlatList,
+    Platform,
+    StyleSheet,
+    Alert,
+    Image,
+} from "react-native";
+import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import ExpenseComponent from "@/app/Components/ExpenseComponent";
+import * as ImagePicker from 'expo-image-picker';
+import ExpenseComponentV2 from "@/app/Components/ExpenseComponentV2";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '@/app/Types/types';
-import { ITransaction } from '@/app/interface/Transaction';
-import { HeaderEdit } from '@/app/Components/Header';
+import { RootStackParamList } from "@/app/Types/types";
+import { ITransaction } from "@/app/interface/Transaction";
 
-interface InputFieldProps {
-    label: string;
-    value: string;
-    onChangeText: (text: string) => void;
-    placeholder: string;
-    keyboardType?: 'default' | 'numeric' | 'email-address' | 'phone-pad';
-    multiline?: boolean;
-}
-
-const InputField: React.FC<InputFieldProps> = ({
-    label,
-    value,
-    onChangeText,
-    placeholder,
-    keyboardType = 'default',
-    multiline = false
-}) => (
-    <View className="mb-4">
-        <Text className="text-gray-700 font-semibold mb-2">{label}</Text>
-        <TextInput
-            className={`bg-gray-100 p-4 rounded-xl shadow-md ${multiline ? 'h-28' : 'h-15'}`}
-            value={value}
-            onChangeText={onChangeText}
-            placeholder={placeholder}
-            keyboardType={keyboardType}
-            multiline={multiline}
-            textAlignVertical={multiline ? 'top' : 'center'}
-        />
-    </View>
-);
-
-interface SelectionGroupProps {
-    label: string;
-    options: string[];
-    selected: string;
-    onSelect: (option: string) => void;
-}
-
-const SelectionGroup: React.FC<SelectionGroupProps> = ({ label, options, selected, onSelect }) => (
-    <View className="mb-4">
-        <Text className="text-gray-700 font-semibold mb-2">{label}</Text>
-        <View className="flex-row flex-wrap">
-            {options.map(option => (
-                <TouchableOpacity
-                    key={option}
-                    onPress={() => onSelect(option)}
-                    className={`mr-2 mb-2 px-4 py-3 rounded-xl ${selected === option ? 'bg-blue-600' : 'bg-gray-200'
-                        }`}
-                >
-                    <Text className={`font-medium ${selected === option ? 'text-white' : 'text-gray-800'}`}>{option}</Text>
-                </TouchableOpacity>
-            ))}
-        </View>
-    </View>
-);
+type EditTransactionScreenNavigationProp = StackNavigationProp<RootStackParamList, 'EditTransaction'>;
+type EditTransactionScreenRouteProp = RouteProp<RootStackParamList, 'EditTransaction'>;
 
 const EditTransactionScreen = () => {
-    const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'EditTransaction'>>();
-    const { transaction } = useRoute().params as { transaction: ITransaction };
+    const navigation = useNavigation<EditTransactionScreenNavigationProp>();
+    const route = useRoute<EditTransactionScreenRouteProp>();
+    const transaction = route.params?.transaction;
 
-    const [form, setForm] = useState(transaction);
-
-    const handleSave = () => {
-        const { amount, description, category, paymentMethod, date, time, location } = form;
-        if (!amount || !description || !category || !paymentMethod || !date || !time || !location) {
-            return Alert.alert("Thiếu thông tin", "Vui lòng điền đầy đủ thông tin cần thiết");
+    // Form state
+    const [money, setMoney] = useState(transaction?.amount ? String(transaction.amount) : "");
+    const [note, setNote] = useState(transaction?.note || "");
+    const [category, setCategory] = useState(transaction?.category || "Chọn loại");
+    const [location, setLocation] = useState(transaction?.location || "");
+    const [date, setDate] = useState(() => {
+        if (transaction?.date && transaction?.time) {
+            const [day, month, year] = transaction.date.split('/').map(Number);
+            const [hour, minute] = transaction.time.split(':').map(Number);
+            const newDate = new Date(year, month - 1, day);
+            newDate.setHours(hour, minute);
+            return newDate;
         }
-        navigation.navigate('TransactionDetail', { transaction: form });
+        return new Date();
+    });
+    const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const [showDetails, setShowDetails] = useState(true);
+    const [showPicker, setShowPicker] = useState(false);
+    const [pickerMode, setPickerMode] = useState<"date" | "time">("date");
+    const [description, setDescription] = useState(transaction?.description || "");
+    const [paymentMethod, setPaymentMethod] = useState(transaction?.paymentMethod || "");
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [imageUri, setImageUri] = useState<string | null>(transaction?.image || null);
+
+    const categories = ["Ăn uống", "Mua sắm", "Di chuyển", "Tiền điện", "Tiền nước", "Học tập", "Giải trí", "Thuê nhà", "Internet", "Khác"];
+
+    const onChangeDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
+        setShowPicker(false);
+        if (event.type === "set" && selectedDate) {
+            setDate(selectedDate);
+        }
     };
 
+    const onChangeTime = (event: DateTimePickerEvent, selectedTime?: Date) => {
+        setShowPicker(false);
+        if (event.type === "set" && selectedTime) {
+            const newDate = new Date(date);
+            newDate.setHours(selectedTime.getHours(), selectedTime.getMinutes());
+            setDate(newDate);
+        }
+    };
+
+    const showDatePicker = () => {
+        setPickerMode("date");
+        setShowPicker(true);
+    };
+
+    const showTimePicker = () => {
+        setPickerMode("time");
+        setShowPicker(true);
+    };
+
+    const pickImage = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setImageUri(result.assets[0].uri);
+        }
+    };
+
+    const takePhoto = async () => {
+        const permission = await ImagePicker.requestCameraPermissionsAsync();
+        if (permission.status !== "granted") {
+            Alert.alert("Cần quyền truy cập", "Bạn cần cấp quyền để sử dụng camera");
+            return;
+        }
+
+        const result = await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setImageUri(result.assets[0].uri);
+        }
+    };
+
+    const handleMoneyChange = (text: string) => {
+        // Loại bỏ tất cả ký tự không phải số
+        const numericValue = text.replace(/[^0-9]/g, "");
+
+        // Nếu có giá trị nhập vào, format lại số tiền
+        if (numericValue) {
+            setMoney(numericValue);
+        } else {
+            setMoney(""); // Nếu người dùng xóa hết thì trả về chuỗi rỗng
+        }
+    };
+
+    const handleSave = () => {
+        const numericAmount = parseInt(String(money).replace(/[^\d]/g, ""));
+        const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+        const formattedTime = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+
+        const updatedTransaction: ITransaction = {
+            ...(transaction || {}),
+            id: transaction?.id || '',
+            amount: numericAmount,
+            date: formattedDate,
+            time: formattedTime, // Lưu đúng thời gian đã chỉnh sửa
+            category,
+            description,
+            location,
+            paymentMethod,
+            note,
+            image: imageUri || ""
+        };
+
+        if (!numericAmount || !category || category === "Chọn loại") {
+            return Alert.alert("Thiếu thông tin", "Vui lòng nhập số tiền và chọn danh mục");
+        }
+
+        navigation.navigate('TransactionDetail', { transaction: updatedTransaction });
+    };
+
+
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
-            <View className="flex-1 bg-gray-50">
-                <HeaderEdit onBack={navigation.goBack} title="Chỉnh sửa giao dịch" onSave={handleSave} />
-                <ScrollView className="flex-1 p-5">
-                    {[
-                        { label: "Số tiền", key: "amount", keyboardType: "numeric" as const },
-                        { label: "Ngày", key: "date", keyboardType: "default" as const },
-                        { label: "Thời gian", key: "time", keyboardType: "default" as const },
-                        { label: "Mô tả", key: "description", keyboardType: "default" as const },
-                        { label: "Địa điểm", key: "location", keyboardType: "default" as const },
-                        { label: "Ghi chú", key: "notes", multiline: true, keyboardType: "default" as const }
-                    ].map(({ label, key, keyboardType, multiline }) => (
-                        <InputField
-                            key={key}
-                            label={label}
-                            value={form[key as keyof ITransaction] as string}
-                            onChangeText={text => setForm(prev => ({ ...prev, [key]: text }))}
-                            placeholder={`Nhập ${label.toLowerCase()}`}
-                            keyboardType={keyboardType}
-                            multiline={multiline}
+        <SafeAreaView style={styles.container}>
+            <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scrollContainer}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={navigation.goBack}>
+                        <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+                    </TouchableOpacity>
+                    <Text style={styles.headerText}>
+                        {transaction ? "Chỉnh sửa giao dịch" : "Thêm giao dịch mới"}
+                    </Text>
+                    <TouchableOpacity onPress={handleSave}>
+                        <Text style={styles.saveText}>Lưu</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {/* Input số tiền */}
+                <TextInput
+                    style={styles.input}
+                    placeholder="Nhập số tiền"
+                    keyboardType="numeric"
+                    value={money}
+                    onChangeText={handleMoneyChange}
+                />
+
+                {showDetails && (
+                    <>
+                        {/* Các mục chi tiêu */}
+                        <View style={styles.card}>
+                            <ExpenseComponent
+                                icon="help-circle-outline"
+                                text={category}
+                                onPress={() => setShowCategoryModal(true)}
+                            />
+                            {/* Ô nhập mô tả */}
+                            <TextInput
+                                style={styles.inputDescription}
+                                placeholder="Nhập mô tả"
+                                value={description}
+                                onChangeText={setDescription}
+                            />
+                            <TextInput
+                                style={styles.inputDescription}
+                                placeholder="Nhập địa điểm"
+                                value={location}
+                                onChangeText={setLocation}
+                            />
+                            <ExpenseComponent
+                                icon="credit-card"
+                                text={paymentMethod || "Chọn phương thức thanh toán"}
+                                onPress={() => setShowPaymentModal(true)}
+                            />
+                            <ExpenseComponent
+                                icon="calendar"
+                                text={date.toLocaleDateString()}
+                                onPress={showDatePicker}
+                            />
+
+                            <ExpenseComponent
+                                icon="clock-outline"
+                                text={date.toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: false,
+                                })}
+                                onPress={showTimePicker}
+                            />
+                            <ExpenseComponent
+                                icon="pencil"
+                                text={note || "Ghi Chú"}
+                                onPress={() => {/* không cần action, người dùng nhập ở input bên dưới */ }}
+                            />
+                        </View>
+
+                        {/* Input ghi chú */}
+                        <TextInput
+                            style={styles.noteInput}
+                            placeholder="Nhập ghi chú"
+                            value={note}
+                            onChangeText={setNote}
+                            multiline
                         />
-                    ))}
-                    <SelectionGroup
-                        label="Danh mục"
-                        options={["Di chuyển", "Ăn uống", "Tiền điện", "Tiền nước", "Học tập", "Giải trí", "Internet", "Khác"]}
-                        selected={form.category}
-                        onSelect={category => setForm(prev => ({ ...prev, category }))}
+
+                        <View style={styles.imageContainer}>
+                            {imageUri && <Image source={{ uri: imageUri }} style={styles.previewImage} />}
+                            <View style={styles.imageButtonContainer}>
+                                <ExpenseComponentV2 icon="image" text="Chọn ảnh" onPress={pickImage} />
+                                <View style={styles.divider} />
+                                <ExpenseComponentV2 icon="camera" text="Chụp ảnh" onPress={takePhoto} />
+                            </View>
+                        </View>
+                    </>
+                )}
+
+                {/* Nút ẩn/hiện chi tiết */}
+                <TouchableOpacity
+                    style={styles.toggleButton}
+                    onPress={() => setShowDetails(!showDetails)}
+                >
+                    <Text style={styles.toggleButtonText}>
+                        {showDetails ? "Ẩn bớt" : "Hiển thêm"}
+                    </Text>
+                </TouchableOpacity>
+
+                {showPicker && (
+                    <DateTimePicker
+                        value={date}
+                        mode={pickerMode}
+                        display={Platform.OS === "ios" ? "inline" : "default"}
+                        onChange={pickerMode === "date" ? onChangeDate : onChangeTime}
                     />
-                    <SelectionGroup
-                        label="Phương thức thanh toán"
-                        options={["Tiền mặt", "Thẻ tín dụng", "Chuyển khoản", "Ví điện tử"]}
-                        selected={form.paymentMethod}
-                        onSelect={paymentMethod => setForm(prev => ({ ...prev, paymentMethod }))}
-                    />
-                </ScrollView>
-            </View>
-        </KeyboardAvoidingView>
+                )}
+
+                {/* Modal Chọn Loại Chi Tiêu */}
+                <Modal
+                    visible={showCategoryModal}
+                    transparent={true}
+                    animationType="slide"
+                    onRequestClose={() => setShowCategoryModal(false)}
+                >
+                    <View style={styles.overlay}>
+                        <View style={styles.modalContainer}>
+                            <Text style={styles.modalTitle}>Chọn loại chi tiêu</Text>
+                            <FlatList
+                                data={categories}
+                                keyExtractor={(item) => item}
+                                renderItem={({ item }) => (
+                                    <TouchableOpacity
+                                        style={styles.listItem}
+                                        onPress={() => {
+                                            setCategory(item);
+                                            setShowCategoryModal(false);
+                                        }}
+                                    >
+                                        <Text>{String(item)}</Text>
+                                    </TouchableOpacity>
+                                )}
+                            />
+                        </View>
+                    </View>
+                </Modal>
+
+                {/* Modal Chọn Phương Thức Thanh Toán */}
+                <Modal
+                    visible={showPaymentModal}
+                    transparent={true}
+                    animationType="slide"
+                    onRequestClose={() => setShowPaymentModal(false)}
+                >
+                    <View style={styles.overlay}>
+                        <View style={styles.modalContainer}>
+                            <Text style={styles.modalTitle}>Chọn phương thức thanh toán</Text>
+                            <FlatList
+                                data={["Tiền mặt", "Thẻ tín dụng", "Chuyển khoản", "Ví điện tử"]}
+                                keyExtractor={(item) => item}
+                                renderItem={({ item }) => (
+                                    <TouchableOpacity
+                                        style={styles.listItem}
+                                        onPress={() => {
+                                            setPaymentMethod(item);
+                                            setShowPaymentModal(false);
+                                        }}
+                                    >
+                                        <Text>{item}</Text>
+                                    </TouchableOpacity>
+                                )}
+                            />
+                        </View>
+                    </View>
+                </Modal>
+            </ScrollView>
+        </SafeAreaView>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "#f3f4f6"
+    },
+    scrollContainer: {
+        flexGrow: 1,
+        padding: 16
+    },
+    header: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 16
+    },
+    headerText: {
+        fontSize: 18,
+        fontWeight: "bold"
+    },
+    saveText: {
+        color: "#1E90FF",
+        fontWeight: "bold",
+        fontSize: 20,
+    },
+    input: {
+        backgroundColor: "#fff",
+        padding: 16,
+        fontSize: 18,
+        borderRadius: 8,
+        marginBottom: 12
+    },
+    card: {
+        backgroundColor: "#fff",
+        borderRadius: 8,
+        padding: 16,
+        marginBottom: 12
+    },
+    noteInput: {
+        backgroundColor: "#fff",
+        padding: 16,
+        borderRadius: 8,
+        marginVertical: 12,
+        fontSize: 16,
+        minHeight: 100,
+        textAlignVertical: "top"
+    },
+    toggleButton: {
+        backgroundColor: "#1E90FF",
+        padding: 12,
+        borderRadius: 8,
+        alignItems: "center",
+        marginTop: 8
+    },
+    toggleButtonText: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "bold"
+    },
+    overlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+    },
+    modalContainer: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        width: '80%',
+        maxHeight: '70%'
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10
+    },
+    listItem: {
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc'
+    },
+    inputDescription: {
+        backgroundColor: "#f8f9fa",
+        borderRadius: 10,
+        padding: 10,
+        fontSize: 16,
+        color: "#333",
+        marginVertical: 6,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2
+    },
+    imageContainer: {
+        backgroundColor: "#fff",
+        borderRadius: 8,
+        padding: 12,
+        marginBottom: 12
+    },
+    previewImage: {
+        width: "100%",
+        height: 240,
+        borderRadius: 8,
+        marginBottom: 12,
+        marginTop: 8
+    },
+    imageButtonContainer: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        alignItems: "center"
+    },
+    divider: {
+        width: 1,
+        height: 30,
+        backgroundColor: "#ccc"
+    }
+});
 
 export default EditTransactionScreen;

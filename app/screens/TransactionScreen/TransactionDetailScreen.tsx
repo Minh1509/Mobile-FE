@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
-import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '@/app/Types/types';
@@ -9,6 +8,7 @@ import { getCategoryIcon } from '@/app/utils/GetCategoryIcon';
 import { Header } from '@/app/Components/Header';
 import { mainStyles } from '@/app/styles';
 import VNDFormat from '@/app/utils/MoneyParse';
+import { TransactionType } from '@/app/interface/Transaction';
 
 type TransactionDetailRouteProp = RouteProp<RootStackParamList, 'TransactionDetail'>;
 type TransactionDetailNavigationProp = StackNavigationProp<RootStackParamList, 'TransactionDetail'>;
@@ -25,8 +25,10 @@ const TransactionDetailScreen = () => {
     const navigation = useNavigation<TransactionDetailNavigationProp>();
     const { params: { transaction } } = useRoute<TransactionDetailRouteProp>();
     const { imageSource } = getCategoryIcon(transaction.category);
-    const isNegative = transaction.amount < 0;
-    const parseAmount = VNDFormat(transaction.amount)
+
+    const sign = transaction.type === TransactionType.INCOME ? "+" : "-";
+    const amountColor = transaction.type === TransactionType.INCOME ? "text-green-500" : "text-red-500";
+    const formattedAmount = `${sign} ${VNDFormat(transaction.amount)}`;
 
     const handleDelete = () => Alert.alert("Xóa giao dịch", "Bạn có chắc chắn muốn xóa?", [
         { text: "Hủy", style: "cancel" },
@@ -45,8 +47,8 @@ const TransactionDetailScreen = () => {
             <ScrollView className="flex-1 p-4">
                 <View className="bg-white rounded-lg p-6 mb-4 shadow items-center">
                     <Image source={imageSource} style={mainStyles.categoryIcon} />
-                    <Text className={`text-3xl font-bold ${isNegative ? "text-red-500" : "text-green-500"} mb-2`}>
-                        {parseAmount}
+                    <Text className={`text-3xl font-bold ${amountColor} mb-2`}>
+                        {formattedAmount}
                     </Text>
                     <Text className="text-gray-600">Lúc {transaction.time || ""} ngày {transaction.date}</Text>
                 </View>
@@ -57,7 +59,7 @@ const TransactionDetailScreen = () => {
                     <DetailItem label="Danh mục" value={transaction.category} />
                     <DetailItem label="Phương thức thanh toán" value={transaction.paymentMethod} />
                     <DetailItem label="Địa điểm" value={transaction.location} />
-                    <DetailItem label="Ghi chú" value={transaction.notes || "Không có ghi chú"} />
+                    <DetailItem label="Ghi chú" value={transaction.note || "Không có ghi chú"} />
                     {transaction.image ? (
                         <View className="my-3">
                             <Text className="text-gray-500 mb-2">Ảnh đính kèm</Text>

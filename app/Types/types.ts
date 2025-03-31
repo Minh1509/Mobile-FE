@@ -6,7 +6,10 @@ export type RootStackParamList = {
   Register: undefined;
   TransactionDetail: { transaction: ITransaction };
   EditTransaction: { transaction: ITransaction };
-  CategoryTransactions: { category: string, transactions: ITransaction[] };
+  CategoryTransactions: {
+    category: string, month: number;
+    year: number;
+  };
   AddExpense: undefined;
   AddIncome: undefined;
   AddBudget: undefined;

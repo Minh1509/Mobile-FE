@@ -10,32 +10,98 @@ import {
   FlatList,
   Platform,
   StyleSheet,
+
 } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ExpenseComponent from "@/app/Components/ExpenseComponent";
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import { Image } from "react-native";
+import * as ImagePicker from 'expo-image-picker';
+import ExpenseComponentV2 from "@/app/Components/ExpenseComponentV2";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { RootStackParamList } from "@/app/Types/types";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import VNDFormat from "@/app/utils/MoneyParse";
 
-type IncomeScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type ExpenseScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
-const IncomeScreen = () => {
+const ExpenseScreen = () => {
   const [money, setMoney] = useState("");
   const [note, setNote] = useState("");
-  const [category, setCategory] = useState("Chọn loại thu nhập");
+  const [category, setCategory] = useState("Chọn loại");
+  const [location, setLocation] = useState("");
   const [date, setDate] = useState(new Date());
   const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showDetails, setShowDetails] = useState(true);
   const [showPicker, setShowPicker] = useState(false);
-  const [expanded, setExpanded] = useState(false); // Trạng thái ẩn/hiện
+  const [pickerMode, setPickerMode] = useState<"date" | "time">("date");
+  const [description, setDescription] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
+
+  const [imageUri, setImageUri] = useState<string | null>(null);
 
   const categories = ["Lương", "Thưởng", "Đầu tư", "Khác"];
+  // const locations = ["Nhà riêng", "Công ty", "Trung tâm thương mại", "Khác"];
 
   const onChangeDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowPicker(false);
     if (event.type === "set" && selectedDate) {
       setDate(selectedDate);
+    }
+  };
+
+  const onChangeTime = (event: DateTimePickerEvent, selectedTime?: Date) => {
+    setShowPicker(false);
+    if (event.type === "set" && selectedTime) {
+      const newDate = new Date(date);
+      newDate.setHours(selectedTime.getHours(), selectedTime.getMinutes());
+      setDate(newDate);
+    }
+  };
+
+  const showDatePicker = () => {
+    setPickerMode("date");
+    setShowPicker(true);
+  };
+
+  const showTimePicker = () => {
+    setPickerMode("time");
+    setShowPicker(true);
+  };
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
+  const takePhoto = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (permission.status !== "granted") {
+      alert("Bạn cần cấp quyền để sử dụng camera");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
     }
   };
 
@@ -45,17 +111,17 @@ const IncomeScreen = () => {
 
     // Nếu có giá trị nhập vào, format lại số tiền
     if (numericValue) {
-      setMoney(VNDFormat(Number(numericValue)));
+      setMoney(String(Number(numericValue)));
     } else {
       setMoney(""); // Nếu người dùng xóa hết thì trả về chuỗi rỗng
     }
   };
 
-  const navigation = useNavigation<IncomeScreenNavigationProp>();
+  const navigation = useNavigation<ExpenseScreenNavigationProp>();
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scrollContainer}>
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={navigation.goBack}>
@@ -76,70 +142,143 @@ const IncomeScreen = () => {
           onChangeText={handleMoneyChange}
         />
 
-        {/* Nút ẩn/hiện chi tiết */}
-        <TouchableOpacity style={styles.toggleButton} onPress={() => setExpanded(!expanded)}>
-          <Text style={styles.toggleText}>Chi tiết</Text>
-          <MaterialCommunityIcons
-            name={expanded ? "chevron-up" : "chevron-down"}
-            size={20}
-            color="#007bff"
-          />
-        </TouchableOpacity>
+        {showDetails && (
+          <>
+            {/* Các mục chi tiêu */}
+            <View style={styles.card}>
+              <ExpenseComponent
+                icon="help-circle-outline"
+                text={category}
+                onPress={() => setShowCategoryModal(true)}
+              />
+              {/* Ô nhập mô tả */}
+              <TextInput
+                style={styles.inputDescription}
+                placeholder="Nhập mô tả"
+                value={description}
+                onChangeText={setDescription}
+              />
+              <TextInput
+                style={styles.inputDescription}
+                placeholder="Nhập địa điểm"
+                value={location}
+                onChangeText={setLocation}
+              />
+              <ExpenseComponent
+                icon="credit-card"
+                text={paymentMethod || "Chọn phương thức thanh toán"}
+                onPress={() => setShowPaymentModal(true)}
+              />
+              <ExpenseComponent
+                icon="calendar"
+                text={date.toLocaleDateString()}
+                onPress={showDatePicker}
+              />
 
-        {/* Phần chi tiết (ẩn/hiện) */}
-        {expanded && (
-          <View style={styles.detailsContainer}>
-            <ExpenseComponent
-              icon="help-circle-outline"
-              text={category}
-              onPress={() => setShowCategoryModal(true)}
+              <ExpenseComponent
+                icon="clock-outline"
+                text={date.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                })}
+                onPress={showTimePicker}
+              />
+              <ExpenseComponent
+                icon="pencil"
+                text={note || "Ghi Chú"}
+                onPress={() => { }}
+              />
+            </View>
+
+            {/* Input ghi chú */}
+            <TextInput
+              className="bg-white p-4 text-base rounded-lg my-3"
+              placeholder="Nhập ghi chú"
+              value={note}
+              onChangeText={setNote}
             />
-            <ExpenseComponent icon="calendar" text={date.toLocaleDateString()} onPress={() => setShowPicker(true)} />
-            <ExpenseComponent icon="pencil" text={note || "Ghi Chú"} onPress={() => {}} />
-          </View>
+
+            <View className="bg-white rounded-lg p-2 my-3">
+              {imageUri && <Image source={{ uri: imageUri }} className="w-full h-60 mt-3 rounded-lg object-cover" />}
+              <View className="flex-row items-center justify-between mt-2">
+                <ExpenseComponentV2 icon="image" text="Chọn ảnh" onPress={pickImage} />
+                <View className="w-px h-10 bg-gray-300" />
+                <ExpenseComponentV2 icon="camera" text="Chụp ảnh" onPress={takePhoto} />
+              </View>
+            </View>
+          </>
         )}
 
-        {/* Input ghi chú */}
-        {expanded && (
-          <TextInput
-            style={styles.input}
-            placeholder="Nhập ghi chú"
-            value={note}
-            onChangeText={setNote}
-          />
-        )}
+        {/* Nút ẩn/hiện chi tiết */}
+        <TouchableOpacity
+          style={styles.toggleButton}
+          onPress={() => setShowDetails(!showDetails)}
+        >
+          <Text style={styles.toggleButtonText}>
+            {showDetails ? "Ẩn bớt" : "Hiển thêm"}
+          </Text>
+        </TouchableOpacity>
 
         {showPicker && (
           <DateTimePicker
             value={date}
-            mode="date"
+            mode={pickerMode}
             display={Platform.OS === "ios" ? "inline" : "default"}
-            onChange={onChangeDate}
+            onChange={pickerMode === "date" ? onChangeDate : onChangeTime}
           />
         )}
 
-        {/* Modal Chọn Loại Thu Nhập */}
+        {/* Modal Chọn Loại Chi Tiêu */}
         <Modal
           visible={showCategoryModal}
           transparent={true}
-          animationType="fade"
+          animationType="slide"
           onRequestClose={() => setShowCategoryModal(false)}
         >
-          <View style={styles.modalOverlay}>
+          <View style={styles.overlay}>
             <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Chọn loại thu nhập</Text>
+              <Text style={styles.modalTitle}>Chọn loại chi tiêu</Text>
               <FlatList
                 data={categories}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
                   <TouchableOpacity
-                    style={styles.modalItem}
+                    style={styles.listItem}
                     onPress={() => {
                       setCategory(item);
                       setShowCategoryModal(false);
                     }}
                   >
-                    <Text style={styles.modalText}>{item}</Text>
+                    <Text>{String(item)}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          </View>
+        </Modal>
+
+        <Modal
+          visible={showPaymentModal}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowPaymentModal(false)}
+        >
+          <View style={styles.overlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Chọn phương thức thanh toán</Text>
+              <FlatList
+                data={["Tiền mặt", "Thẻ tín dụng", "Ví điện tử"]}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.listItem}
+                    onPress={() => {
+                      setPaymentMethod(item);
+                      setShowPaymentModal(false);
+                    }}
+                  >
+                    <Text>{item}</Text>
                   </TouchableOpacity>
                 )}
               />
@@ -151,90 +290,24 @@ const IncomeScreen = () => {
   );
 };
 
-export default IncomeScreen;
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f4f6f9",
-  },
-  scrollContainer: {
-    padding: 16,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  headerText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  saveText: {
-    color: "#007bff",
-    fontWeight: "bold",
-  },
-  input: {
-    backgroundColor: "#fff",
-    padding: 14,
-    fontSize: 16,
-    borderRadius: 10,
-    marginVertical: 6,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  toggleButton: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 14,
-    borderRadius: 10,
-    marginVertical: 6,
-  },
-  toggleText: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  detailsContainer: {
-    backgroundColor: "#fff",
-    padding: 14,
-    borderRadius: 10,
-    marginVertical: 6,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContainer: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
-    width: "80%",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  modalItem: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-  },
-  modalText: {
-    fontSize: 16,
-  },
+  container: { flex: 1, backgroundColor: "#f3f4f6" },
+  scrollContainer: { flexGrow: 1, padding: 16 },
+  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
+  headerText: { fontSize: 18, fontWeight: "bold" },
+  saveText: { color: "#1E90FF", fontWeight: "bold", fontSize: 18 },
+  input: { backgroundColor: "#fff", padding: 16, fontSize: 18, borderRadius: 8, marginBottom: 12 },
+  card: { backgroundColor: "#fff", borderRadius: 8, padding: 16, marginBottom: 12 },
+  toggleButton: { backgroundColor: "#1E90FF", padding: 12, borderRadius: 8, alignItems: "center" },
+  toggleButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  overlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+  modalContainer: { backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%' },
+  modalTitle: { fontSize: 18, fontWeight: 'bold' },
+  listItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc' },
+  inputDescription: { backgroundColor: "#f8f9fa", borderRadius: 10, padding: 10, fontSize: 16, color: "#333", marginVertical: 6, shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2, elevation: 2 },
 });
+
+
+export default ExpenseScreen;
+
+
