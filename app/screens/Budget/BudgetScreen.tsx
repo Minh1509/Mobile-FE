@@ -10,6 +10,7 @@ import {
   FlatList,
   Platform,
   StyleSheet,
+  Alert,
 } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -17,37 +18,63 @@ import ExpenseComponent from "@/app/Components/ExpenseComponent";
 import { RootStackParamList } from "@/app/Types/types";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import VNDFormat from "@/app/utils/MoneyParse";
+import { formatDate, normalizeDate } from "@/app/utils/normalizeDate";
+import { addBudget } from "@/app/services/firestore.service";
+import { useUserAuth } from "@/app/hooks/userAuth"; // Lấy userId từ context
 
 type BudgetScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 const BudgetScreen = () => {
+  const { userId } = useUserAuth(); // Giả định có userId ở đây
+
   const [money, setMoney] = useState("");
   const [note, setNote] = useState("");
   const [category, setCategory] = useState("Chọn loại ngân sách");
-  const [date, setDate] = useState(new Date());
+  const [fromDate, setFromDate] = useState(new Date());
+  const [toDate, setToDate] = useState(new Date());
   const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [showPicker, setShowPicker] = useState(false);
-  const [expanded, setExpanded] = useState(false); // Trạng thái ẩn/hiện
+  const [showFromDatePicker, setShowFromDatePicker] = useState(false);
+  const [showToDatePicker, setShowToDatePicker] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
-  const categories = ["Lương", "Thưởng", "Đầu tư", "Khác"];
+  const categories = ["Di chuyển", "Ăn uống", "Tiền điện", "Mua sắm", "Tiền nước", "Học tập", "Giải trí", "Thuê nhà", "Internet", "Khác"];
 
-  const onChangeDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
-    setShowPicker(false);
+  const onChangeFromDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    setShowFromDatePicker(false);
     if (event.type === "set" && selectedDate) {
-      setDate(selectedDate);
+      setFromDate(selectedDate);
     }
   };
 
-  const handleMoneyChange = (text: string) => {
-    // Loại bỏ tất cả ký tự không phải số
-    const numericValue = text.replace(/[^0-9]/g, "");
+  const onChangeToDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    setShowToDatePicker(false);
+    if (event.type === "set" && selectedDate) {
+      setToDate(selectedDate);
+    }
+  };
 
-    // Nếu có giá trị nhập vào, format lại số tiền
-    if (numericValue) {
-      setMoney(String(Number(numericValue)));
-    } else {
-      setMoney(""); // Nếu người dùng xóa hết thì trả về chuỗi rỗng
+  const handleSaveBudget = async () => {
+    if (!money || category === "Chọn loại ngân sách") {
+      Alert.alert("Lỗi", "Vui lòng nhập số tiền và chọn loại ngân sách!");
+      return;
+    }
+
+    const budgetData = {
+      userId,
+      amountLimit: parseFloat(money),
+      category,
+      note,
+      startDate: formatDate(fromDate),
+      endDate: formatDate(toDate),
+    };
+
+    try {
+      await addBudget(budgetData);
+      Alert.alert("Thành công", "Ngân sách đã được lưu thành công!");
+      navigation.goBack();
+    } catch (error) {
+      console.error("Lỗi khi lưu ngân sách:", error);
+      Alert.alert("Lỗi", "Có lỗi xảy ra khi lưu ngân sách!");
     }
   };
 
@@ -62,7 +89,7 @@ const BudgetScreen = () => {
             <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
           </TouchableOpacity>
           <Text style={styles.headerText}>Thêm ngân sách</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleSaveBudget}>
             <Text style={styles.saveText}>Lưu</Text>
           </TouchableOpacity>
         </View>
@@ -73,7 +100,7 @@ const BudgetScreen = () => {
           placeholder="Nhập số tiền"
           keyboardType="numeric"
           value={money}
-          onChangeText={handleMoneyChange}
+          onChangeText={setMoney}
         />
 
         {/* Nút ẩn/hiện chi tiết */}
@@ -94,7 +121,8 @@ const BudgetScreen = () => {
               text={category}
               onPress={() => setShowCategoryModal(true)}
             />
-            <ExpenseComponent icon="calendar" text={date.toLocaleDateString()} onPress={() => setShowPicker(true)} />
+            <ExpenseComponent icon="calendar" text={`Từ ngày: ${formatDate(fromDate)}`} onPress={() => setShowFromDatePicker(true)} />
+            <ExpenseComponent icon="calendar" text={`Đến ngày: ${formatDate(toDate)}`} onPress={() => setShowToDatePicker(true)} />
             <ExpenseComponent icon="pencil" text={note || "Ghi Chú"} onPress={() => { }} />
           </View>
         )}
@@ -109,12 +137,21 @@ const BudgetScreen = () => {
           />
         )}
 
-        {showPicker && (
+        {showFromDatePicker && (
           <DateTimePicker
-            value={date}
+            value={fromDate}
             mode="date"
             display={Platform.OS === "ios" ? "inline" : "default"}
-            onChange={onChangeDate}
+            onChange={onChangeFromDate}
+          />
+        )}
+
+        {showToDatePicker && (
+          <DateTimePicker
+            value={toDate}
+            mode="date"
+            display={Platform.OS === "ios" ? "inline" : "default"}
+            onChange={onChangeToDate}
           />
         )}
 
