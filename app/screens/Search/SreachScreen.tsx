@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTransactions } from '@/app/hooks/useTransactions';
 import { normalizeDate } from '@/app/utils/normalizeDate';
 
-const CATEGORIES = ["Tất cả", "Di chuyển", "Ăn uống", "Tiền điện", "Tiền nước", "Học tập", "Giải trí", "Thuê nhà", "Thu nhập", "Internet", "Lương", "Thưởng", "Đầu tư", "Khác"];
+const CATEGORIES = ["Tất cả", "Di chuyển", "Ăn uống", "Mua sắm", "Tiền điện", "Tiền nước", "Học tập", "Giải trí", "Thuê nhà", "Internet", "Lương", "Thưởng", "Đầu tư", "Khác"];
 const SORT_OPTIONS = ["Số tiền giảm dần", "Số tiền tăng dần", "Thời gian giảm dần", "Thời gian tăng dần"];
 
 const SearchScreen = () => {

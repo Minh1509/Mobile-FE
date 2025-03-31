@@ -105,18 +105,6 @@ const ExpenseScreen = () => {
     }
   };
 
-  const handleMoneyChange = (text: string) => {
-    // Loại bỏ tất cả ký tự không phải số
-    const numericValue = text.replace(/[^0-9]/g, "");
-
-    // Nếu có giá trị nhập vào, format lại số tiền
-    if (numericValue) {
-      setMoney(String(Number(numericValue)));
-    } else {
-      setMoney(""); // Nếu người dùng xóa hết thì trả về chuỗi rỗng
-    }
-  };
-
   const navigation = useNavigation<ExpenseScreenNavigationProp>();
 
   return (
@@ -139,7 +127,7 @@ const ExpenseScreen = () => {
           placeholder="Nhập số tiền"
           keyboardType="numeric"
           value={money}
-          onChangeText={handleMoneyChange}
+          onChangeText={setMoney}
         />
 
         {showDetails && (
@@ -257,35 +245,6 @@ const ExpenseScreen = () => {
             </View>
           </View>
         </Modal>
-
-        {/* Modal Chọn Địa Điểm */}
-        {/* <Modal
-          visible={showLocationModal}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setShowLocationModal(false)}
-        >
-          <View style={styles.overlay}>
-            <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Chọn địa điểm</Text>
-              <FlatList
-                data={locations}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.listItem}
-                    onPress={() => {
-                      setLocation(item);
-                      setShowLocationModal(false);
-                    }}
-                  >
-                    <Text>{String(item)}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
-          </View>
-        </Modal> */}
 
         {/* Modal Chọn Phương Thức Thanh Toán */}
         <Modal

@@ -105,17 +105,6 @@ const ExpenseScreen = () => {
     }
   };
 
-  const handleMoneyChange = (text: string) => {
-    // Loại bỏ tất cả ký tự không phải số
-    const numericValue = text.replace(/[^0-9]/g, "");
-
-    // Nếu có giá trị nhập vào, format lại số tiền
-    if (numericValue) {
-      setMoney(String(Number(numericValue)));
-    } else {
-      setMoney(""); // Nếu người dùng xóa hết thì trả về chuỗi rỗng
-    }
-  };
 
   const navigation = useNavigation<ExpenseScreenNavigationProp>();
 
@@ -139,7 +128,7 @@ const ExpenseScreen = () => {
           placeholder="Nhập số tiền"
           keyboardType="numeric"
           value={money}
-          onChangeText={handleMoneyChange}
+          onChangeText={setMoney}
         />
 
         {showDetails && (
