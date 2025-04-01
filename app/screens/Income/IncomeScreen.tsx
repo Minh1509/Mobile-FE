@@ -28,9 +28,9 @@ import { getCategories } from "@/app/services/firestore.service";
 import { ICategory } from "@/app/interface/Category";
 import { formatDate, formatTime } from "@/app/utils/normalizeDate";
 
-type ExpenseScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type IncomeScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
-const ExpenseScreen = () => {
+const IncomeScreen = () => {
   const [money, setMoney] = useState("");
   const [note, setNote] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
@@ -50,7 +50,7 @@ const ExpenseScreen = () => {
   const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   const paymentMethods = ["Tiền mặt", "Thẻ tín dụng", "Ví điện tử"];
-  const navigation = useNavigation<ExpenseScreenNavigationProp>();
+  const navigation = useNavigation<IncomeScreenNavigationProp>();
   const { userId, loading } = useUserAuth();
 
   useEffect(() => {
@@ -311,22 +311,21 @@ const ExpenseScreen = () => {
           <View style={styles.overlay}>
             <View style={styles.modalContainer}>
               <Text style={styles.modalTitle}>Chọn loại chi tiêu</Text>
-              <FlatList
-                data={categories}
-                keyExtractor={(item, index) => index.toString()} // Sử dụng index làm key
-                renderItem={({ item }) => (
+              <ScrollView>
+                {categories.map((item, index) => (
                   <TouchableOpacity
+                    key={index.toString()} // Sử dụng index làm key
                     style={styles.listItem}
                     onPress={() => {
-                      setCategoryId(item.id); // Lưu tên danh mục làm categoryId
+                      setCategoryId(item.id);
                       setCategoryName(item.name);
                       setShowCategoryModal(false);
                     }}
                   >
-                    <Text>{item.name}</Text> {/* Hiển thị trực tiếp item vì item là string */}
+                    <Text>{item.name}</Text>
                   </TouchableOpacity>
-                )}
-              />
+                ))}
+              </ScrollView>
             </View>
           </View>
         </Modal>
@@ -374,10 +373,10 @@ const styles = StyleSheet.create({
   toggleButton: { backgroundColor: "#1E90FF", padding: 12, borderRadius: 8, alignItems: "center" },
   toggleButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
   overlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' },
-  modalContainer: { backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%' },
+  modalContainer: { backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%', maxHeight: "60%" },
   modalTitle: { fontSize: 18, fontWeight: 'bold' },
   listItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc' },
   inputDescription: { backgroundColor: "#f8f9fa", borderRadius: 10, padding: 10, fontSize: 16, color: "#333", marginVertical: 6, shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2, elevation: 2 },
 });
 
-export default ExpenseScreen;
+export default IncomeScreen;

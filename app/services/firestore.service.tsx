@@ -28,10 +28,6 @@ export const addExpense = async (expense: Omit<ITransaction, 'id' | 'type' | 'cr
         const transactionData: Omit<ITransaction, 'id'> = {
             ...expense,
             type: TransactionType.EXPENSE,
-            date: expense.date
-                ? Timestamp.fromDate(new Date(expense.date)).toDate().toISOString() // Chuyển Timestamp thành string
-                : Timestamp.fromDate(new Date()).toDate().toISOString(),
-            time: expense.time || new Date().toISOString().split('T')[1].split('.')[0],
             createdAt: Timestamp.fromDate(new Date()).toDate().toISOString(),
             updatedAt: Timestamp.fromDate(new Date()).toDate().toISOString(),
         };
