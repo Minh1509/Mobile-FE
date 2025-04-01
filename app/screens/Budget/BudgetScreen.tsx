@@ -19,7 +19,7 @@ import { RootStackParamList } from "@/app/Types/types";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { formatDate, normalizeDate } from "@/app/utils/normalizeDate";
-import { addBudget } from "@/app/services/firestore.service";
+import { addBudget } from "@/app/services/budget.service";
 import { useUserAuth } from "@/app/hooks/userAuth"; // Lấy userId từ context
 
 type BudgetScreenNavigationProp = StackNavigationProp<RootStackParamList>;

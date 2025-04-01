@@ -21,10 +21,10 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from "react-native";
-import { addIncome } from "@/app/services/firestore.service";
+import { addIncome } from "@/app/services/budget.service";
 import { ITransaction, PayMethod, TransactionType } from "@/app/interface/Transaction";
 import { useUserAuth } from "@/app/hooks/userAuth";
-import { getCategories } from "@/app/services/firestore.service";
+import { getCategories } from "@/app/services/budget.service";
 import { ICategory } from "@/app/interface/Category";
 import { formatDate, formatTime } from "@/app/utils/normalizeDate";
 
