@@ -1,4 +1,4 @@
-import { ITransaction, TransactionType } from "../interface/Transaction";
+import { ITransaction, TransactionType, PayMethod } from "../interface/Transaction";
 
 export const transactions: ITransaction[] = [
     {
@@ -9,10 +9,10 @@ export const transactions: ITransaction[] = [
         category: "Di chuyển",
         date: "20/03/2025",
         time: "09:00",
-        paymentMethod: "Tiền mặt",
+        paymentMethod: PayMethod.CASH,
         location: "Hà Nội",
         image: "https://th.bing.com/th/id/OIP.OkKi7MagZ2MS57OrhjQ7hQAAAA?rs=1&pid=ImgDetMain",
-        notes: "",
+        note: "",
         type: TransactionType.EXPENSE
     },
     {
@@ -22,10 +22,10 @@ export const transactions: ITransaction[] = [
         amount: 50000,
         category: "Di chuyển",
         date: "20/03/2025",
-        paymentMethod: "Tiền mặt",
+        paymentMethod: PayMethod.CASH,
         location: "Hà Nội",
         image: "https://th.bing.com/th/id/OIP.bi66zoR_BWkIErHOvc3GuAHaEl?rs=1&pid=ImgDetMain",
-        notes: "",
+        note: "",
         time: "10:00",
         type: TransactionType.EXPENSE
     },
@@ -37,10 +37,10 @@ export const transactions: ITransaction[] = [
         category: "Tiền điện",
         date: "20/03/2025",
         time: "10:00",
-        paymentMethod: "Chuyển khoản",
+        paymentMethod: PayMethod.BANK_TRANSFER,
         location: "Hà Nội",
         image: "",
-        notes: "Hoá đơn điện tháng 3/2025",
+        note: "Hoá đơn điện tháng 3/2025",
         type: TransactionType.EXPENSE
     },
     {
@@ -51,10 +51,10 @@ export const transactions: ITransaction[] = [
         category: "Tiền nước",
         date: "20/03/2025",
         time: "10:00",
-        paymentMethod: "Tiền mặt",
+        paymentMethod: PayMethod.CASH,
         location: "Hà Nội",
         image: "",
-        notes: "",
+        note: "",
         type: TransactionType.EXPENSE
     },
     {
@@ -65,9 +65,9 @@ export const transactions: ITransaction[] = [
         category: "Khác",
         date: "20/03/2025",
         time: "10:00",
-        paymentMethod: "Chuyển khoản",
+        paymentMethod: PayMethod.BANK_TRANSFER,
         location: "Hà Nội",
-        notes: "Tiền bán đồ cũ",
+        note: "Tiền bán đồ cũ",
         image: "",
         type: TransactionType.INCOME
     },
@@ -79,10 +79,10 @@ export const transactions: ITransaction[] = [
         category: "Ăn uống",
         date: "19/03/2025",
         time: "10:00",
-        paymentMethod: "Tiền mặt",
+        paymentMethod: PayMethod.CASH,
         location: "Hà Nội",
         image: "",
-        notes: "Ăn tối tại nhà hàng",
+        note: "Ăn tối tại nhà hàng",
         type: TransactionType.EXPENSE
     },
     {
@@ -93,10 +93,10 @@ export const transactions: ITransaction[] = [
         category: "Mua sắm",
         date: "18/03/2025",
         time: "10:00",
-        paymentMethod: "Chuyển khoản",
+        paymentMethod: PayMethod.BANK_TRANSFER,
         location: "Hà Nội",
         image: "",
-        notes: "Mua quần áo",
+        note: "Mua quần áo",
         type: TransactionType.EXPENSE
     },
     {
@@ -107,10 +107,10 @@ export const transactions: ITransaction[] = [
         category: "Thuê nhà",
         date: "17/03/2025",
         time: "10:00",
-        paymentMethod: "Chuyển khoản",
+        paymentMethod: PayMethod.CASH,
         location: "Hà Nội",
         image: "",
-        notes: "Tiền thuê nhà tháng 3/2025",
+        note: "Tiền thuê nhà tháng 3/2025",
         type: TransactionType.EXPENSE
     },
     {
@@ -121,10 +121,10 @@ export const transactions: ITransaction[] = [
         category: "Lương",
         date: "16/03/2025",
         time: "10:00",
-        paymentMethod: "Chuyển khoản",
+        paymentMethod: PayMethod.BANK_TRANSFER,
         location: "Hà Nội",
         image: "",
-        notes: "Lương công ty",
+        note: "Lương công ty",
         type: TransactionType.INCOME
     },
     {
@@ -135,10 +135,10 @@ export const transactions: ITransaction[] = [
         category: "Di chuyển",
         date: "15/03/2025",
         time: "10:00",
-        paymentMethod: "Tiền mặt",
+        paymentMethod: PayMethod.CASH,
         location: "Hà Nội",
         image: "",
-        notes: "Đổ xăng xe máy",
+        note: "Đổ xăng xe máy",
         type: TransactionType.EXPENSE
     },
     {
@@ -149,10 +149,10 @@ export const transactions: ITransaction[] = [
         category: "Internet",
         date: "14/03/2025",
         time: "10:00",
-        paymentMethod: "Chuyển khoản",
+        paymentMethod: PayMethod.BANK_TRANSFER,
         location: "Hà Nội",
         image: "",
-        notes: "Thanh toán cước internet",
+        note: "Thanh toán cước internet",
         type: TransactionType.EXPENSE
     },
     {
@@ -163,10 +163,10 @@ export const transactions: ITransaction[] = [
         category: "Internet",
         date: "23/03/2025",
         time: "10:00",
-        paymentMethod: "Chuyển khoản",
+        paymentMethod: PayMethod.BANK_TRANSFER,
         location: "Hà Nội",
         image: "",
-        notes: "Thanh toán cước internet",
+        note: "Thanh toán cước internet",
         type: TransactionType.EXPENSE
     },
     {
@@ -177,10 +177,10 @@ export const transactions: ITransaction[] = [
         category: "Đầu tư",
         date: "20/02/2025",
         time: "10:00",
-        paymentMethod: "Chuyển khoản",
+        paymentMethod: PayMethod.CASH,
         location: "Hà Nội",
         image: "",
-        notes: "",
+        note: "",
         type: TransactionType.INCOME
     },
     {
@@ -191,10 +191,10 @@ export const transactions: ITransaction[] = [
         category: "Đầu tư",
         date: "30/04/2025",
         time: "10:00",
-        paymentMethod: "Chuyển khoản",
+        paymentMethod: PayMethod.CASH,
         location: "Hà Nội",
         image: "",
-        notes: "",
+        note: "",
         type: TransactionType.INCOME
     }
 ];
