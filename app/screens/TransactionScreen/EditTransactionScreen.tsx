@@ -22,6 +22,8 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from "@/app/Types/types";
 import { ITransaction } from "@/app/interface/Transaction";
+import { TransactionService } from '@/app/services/transaction.service'; // Import TransactionService
+import { PayMethod } from "@/app/interface/Transaction";
 
 type EditTransactionScreenNavigationProp = StackNavigationProp<RootStackParamList, 'EditTransaction'>;
 type EditTransactionScreenRouteProp = RouteProp<RootStackParamList, 'EditTransaction'>;
@@ -31,6 +33,7 @@ const EditTransactionScreen = () => {
     const route = useRoute<EditTransactionScreenRouteProp>();
     const transaction = route.params?.transaction;
 
+    const paymentMethods = ["cash", "card", "bank_transfer"];
     // Form state
     const [money, setMoney] = useState(transaction?.amount ? String(transaction.amount) : "");
     const [note, setNote] = useState(transaction?.note || "");
@@ -116,28 +119,41 @@ const EditTransactionScreen = () => {
     };
 
     const handleMoneyChange = (text: string) => {
-        // Loại bỏ tất cả ký tự không phải số
         const numericValue = text.replace(/[^0-9]/g, "");
-
-        // Nếu có giá trị nhập vào, format lại số tiền
         if (numericValue) {
             setMoney(numericValue);
         } else {
-            setMoney(""); // Nếu người dùng xóa hết thì trả về chuỗi rỗng
+            setMoney("");
         }
     };
 
-    const handleSave = () => {
+    const mapStringToPayMethod = (method: string): PayMethod => {
+        switch (method) {
+            case "Tiền mặt":
+                return PayMethod.CASH;
+            case "Thẻ tín dụng":
+                return PayMethod.CARD;
+            case "Ví điện tử":
+                return PayMethod.BANK_TRANSFER;
+            default:
+                throw new Error(`Phương thức thanh toán không hợp lệ: ${method}`);
+        }
+    };
+
+    const handleSave = async () => {
         const numericAmount = parseInt(String(money).replace(/[^\d]/g, ""));
         const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
         const formattedTime = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
 
-        const updatedTransaction: ITransaction = {
-            ...(transaction || {}),
-            id: transaction?.id || '',
+        if (!numericAmount || !category || category === "Chọn loại") {
+            Alert.alert("Thiếu thông tin", "Vui lòng nhập số tiền và chọn danh mục");
+            return;
+        }
+
+        const updatedTransaction: Partial<ITransaction> = {
             amount: numericAmount,
             date: formattedDate,
-            time: formattedTime, // Lưu đúng thời gian đã chỉnh sửa
+            time: formattedTime,
             category,
             description,
             location,
@@ -146,13 +162,20 @@ const EditTransactionScreen = () => {
             image: imageUri || ""
         };
 
-        if (!numericAmount || !category || category === "Chọn loại") {
-            return Alert.alert("Thiếu thông tin", "Vui lòng nhập số tiền và chọn danh mục");
+        try {
+            const result = await TransactionService.updateTransaction(transaction.id, updatedTransaction);
+            if (result.success) {
+                Alert.alert("Thành công", "Giao dịch đã được cập nhật.", [
+                    { text: "OK", onPress: () => navigation.navigate('TransactionDetail', { transaction: { ...transaction, ...updatedTransaction } }) }
+                ]);
+            } else {
+                Alert.alert("Lỗi", result.error || "Không thể cập nhật giao dịch. Vui lòng thử lại.");
+            }
+        } catch (error: any) {
+            console.error("Lỗi khi cập nhật giao dịch:", error);
+            Alert.alert("Lỗi", "Không thể cập nhật giao dịch. Vui lòng thử lại.");
         }
-
-        navigation.navigate('TransactionDetail', { transaction: updatedTransaction });
     };
-
 
     return (
         <SafeAreaView style={styles.container}>
@@ -188,7 +211,6 @@ const EditTransactionScreen = () => {
                                 text={category}
                                 onPress={() => setShowCategoryModal(true)}
                             />
-                            {/* Ô nhập mô tả */}
                             <TextInput
                                 style={styles.inputDescription}
                                 placeholder="Nhập mô tả"
@@ -211,7 +233,6 @@ const EditTransactionScreen = () => {
                                 text={date.toLocaleDateString()}
                                 onPress={showDatePicker}
                             />
-
                             <ExpenseComponent
                                 icon="clock-outline"
                                 text={date.toLocaleTimeString([], {
@@ -224,7 +245,7 @@ const EditTransactionScreen = () => {
                             <ExpenseComponent
                                 icon="pencil"
                                 text={note || "Ghi Chú"}
-                                onPress={() => {/* không cần action, người dùng nhập ở input bên dưới */ }}
+                                onPress={() => {}}
                             />
                         </View>
 
@@ -307,13 +328,14 @@ const EditTransactionScreen = () => {
                         <View style={styles.modalContainer}>
                             <Text style={styles.modalTitle}>Chọn phương thức thanh toán</Text>
                             <FlatList
-                                data={["Tiền mặt", "Thẻ tín dụng", "Chuyển khoản", "Ví điện tử"]}
+                                data={["Tiền mặt", "Thẻ tín dụng", "Ví điện tử"]}
                                 keyExtractor={(item) => item}
                                 renderItem={({ item }) => (
                                     <TouchableOpacity
                                         style={styles.listItem}
                                         onPress={() => {
-                                            setPaymentMethod(item);
+                                            const payMethod = mapStringToPayMethod(item);
+                                            setPaymentMethod(payMethod);
                                             setShowPaymentModal(false);
                                         }}
                                     >
