@@ -46,8 +46,6 @@ export const addBudget = async (budget: any) => {
     try {
         const docRef = await addDoc(collection(db, "budgets"), {
             ...budget,
-            start_date: Timestamp.fromDate(new Date()),
-            end_date: Timestamp.fromDate(new Date("2025-12-31")),
         });
         console.log("Ngân sách đã được thêm với ID:", docRef.id);
         return docRef.id;
