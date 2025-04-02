@@ -15,6 +15,7 @@ export type RootStackParamList = {
   AddExpense: undefined;
   AddIncome: undefined;
   AddBudget: undefined;
+  Profile: undefined;
 };
 
 export type BottomTabParamList = {
