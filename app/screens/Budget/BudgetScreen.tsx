@@ -12,20 +12,21 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ExpenseComponent from "@/app/Components/ExpenseComponent";
 import { RootStackParamList } from "@/app/Types/types";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import { formatDate, normalizeDate } from "@/app/utils/normalizeDate";
+import { formatDate } from "@/app/utils/normalizeDate";
 import { addBudget } from "@/app/services/budget.service";
-import { useUserAuth } from "@/app/hooks/userAuth"; // Lấy userId từ context
+import { useUserAuth } from "@/app/hooks/userAuth";
 
 type BudgetScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 const BudgetScreen = () => {
-  const { userId } = useUserAuth(); // Giả định có userId ở đây
+  const { userId, loading } = useUserAuth();
+  const navigation = useNavigation<BudgetScreenNavigationProp>();
 
   const [money, setMoney] = useState("");
   const [note, setNote] = useState("");
@@ -35,27 +36,31 @@ const BudgetScreen = () => {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showFromDatePicker, setShowFromDatePicker] = useState(false);
   const [showToDatePicker, setShowToDatePicker] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   const categories = ["Di chuyển", "Ăn uống", "Tiền điện", "Mua sắm", "Tiền nước", "Học tập", "Giải trí", "Thuê nhà", "Internet", "Khác"];
 
-  const onChangeFromDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
+  const onChangeFromDate = (event: any, selectedDate?: Date) => {
     setShowFromDatePicker(false);
-    if (event.type === "set" && selectedDate) {
-      setFromDate(selectedDate);
-    }
+    if (selectedDate) setFromDate(selectedDate);
   };
 
-  const onChangeToDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
+  const onChangeToDate = (event: any, selectedDate?: Date) => {
     setShowToDatePicker(false);
-    if (event.type === "set" && selectedDate) {
-      setToDate(selectedDate);
-    }
+    if (selectedDate) setToDate(selectedDate);
   };
 
   const handleSaveBudget = async () => {
-    if (!money || category === "Chọn loại ngân sách") {
-      Alert.alert("Lỗi", "Vui lòng nhập số tiền và chọn loại ngân sách!");
+    if (!money || parseFloat(money) <= 0) {
+      Alert.alert("Lỗi", "Vui lòng nhập số tiền hợp lệ (lớn hơn 0)!");
+      return;
+    }
+    if (category === "Chọn loại ngân sách") {
+      Alert.alert("Lỗi", "Vui lòng chọn loại ngân sách!");
+      return;
+    }
+    if (!userId) {
+      Alert.alert("Lỗi", "Bạn cần đăng nhập để thêm ngân sách!");
       return;
     }
 
@@ -78,201 +83,292 @@ const BudgetScreen = () => {
     }
   };
 
-  const navigation = useNavigation<BudgetScreenNavigationProp>();
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Đang tải...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={navigation.goBack}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
-          </TouchableOpacity>
-          <Text style={styles.headerText}>Thêm ngân sách</Text>
-          <TouchableOpacity onPress={handleSaveBudget}>
-            <Text style={styles.saveText}>Lưu</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Input số tiền */}
-        <TextInput
-          style={styles.input}
-          placeholder="Nhập số tiền"
-          keyboardType="numeric"
-          value={money}
-          onChangeText={setMoney}
-        />
-
-        {/* Nút ẩn/hiện chi tiết */}
-        <TouchableOpacity style={styles.toggleButton} onPress={() => setExpanded(!expanded)}>
-          <Text style={styles.toggleText}>Chi tiết</Text>
-          <MaterialCommunityIcons
-            name={expanded ? "chevron-up" : "chevron-down"}
-            size={20}
-            color="#007bff"
-          />
-        </TouchableOpacity>
-
-        {/* Phần chi tiết (ẩn/hiện) */}
-        {expanded && (
-          <View style={styles.detailsContainer}>
-            <ExpenseComponent
-              icon="help-circle-outline"
-              text={category}
-              onPress={() => setShowCategoryModal(true)}
-            />
-            <ExpenseComponent icon="calendar" text={`Từ ngày: ${formatDate(fromDate)}`} onPress={() => setShowFromDatePicker(true)} />
-            <ExpenseComponent icon="calendar" text={`Đến ngày: ${formatDate(toDate)}`} onPress={() => setShowToDatePicker(true)} />
-            <ExpenseComponent icon="pencil" text={note || "Ghi Chú"} onPress={() => { }} />
+      <View style={styles.background}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity onPress={navigation.goBack} style={styles.iconButton}>
+              <MaterialCommunityIcons name="arrow-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.headerText} numberOfLines={1} ellipsizeMode="tail">
+              Thêm Ngân Sách
+            </Text>
+            <TouchableOpacity onPress={handleSaveBudget} style={styles.saveButton}>
+              <Text style={styles.saveText}>Lưu</Text>
+            </TouchableOpacity>
           </View>
-        )}
 
-        {/* Input ghi chú */}
-        {expanded && (
-          <TextInput
-            style={styles.input}
-            placeholder="Nhập ghi chú"
-            value={note}
-            onChangeText={setNote}
-          />
-        )}
+          {/* Money Input */}
+          <View style={styles.moneyInputContainer}>
+            <TextInput
+              style={styles.moneyInput}
+              placeholder="0.00"
+              placeholderTextColor="#999"
+              keyboardType="numeric"
+              value={money}
+              onChangeText={setMoney}
+            />
+            <Text style={styles.currencyText}>VND</Text>
+          </View>
 
-        {showFromDatePicker && (
-          <DateTimePicker
-            value={fromDate}
-            mode="date"
-            display={Platform.OS === "ios" ? "inline" : "default"}
-            onChange={onChangeFromDate}
-          />
-        )}
+          {/* Toggle Details */}
+          <TouchableOpacity
+            style={styles.toggleButton}
+            onPress={() => setExpanded(!expanded)}
+          >
+            <Text style={styles.toggleButtonText}>
+              {expanded ? "Ẩn chi tiết" : "Hiện chi tiết"}
+            </Text>
+          </TouchableOpacity>
 
-        {showToDatePicker && (
-          <DateTimePicker
-            value={toDate}
-            mode="date"
-            display={Platform.OS === "ios" ? "inline" : "default"}
-            onChange={onChangeToDate}
-          />
-        )}
-
-        {/* Modal Chọn Loại ngân sách */}
-        <Modal
-          visible={showCategoryModal}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setShowCategoryModal(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Chọn loại ngân sách</Text>
-              <FlatList
-                data={categories}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.modalItem}
-                    onPress={() => {
-                      setCategory(item);
-                      setShowCategoryModal(false);
-                    }}
-                  >
-                    <Text style={styles.modalText}>{item}</Text>
-                  </TouchableOpacity>
-                )}
+          {/* Details Section */}
+          {expanded && (
+            <View style={styles.detailsCard}>
+              <ExpenseComponent
+                icon="help-circle-outline"
+                text={category}
+                onPress={() => setShowCategoryModal(true)}
+              />
+              <ExpenseComponent
+                icon="calendar"
+                text={`Từ ngày: ${formatDate(fromDate)}`}
+                onPress={() => setShowFromDatePicker(true)}
+              />
+              <ExpenseComponent
+                icon="calendar"
+                text={`Đến ngày: ${formatDate(toDate)}`}
+                onPress={() => setShowToDatePicker(true)}
+              />
+              <TextInput
+                style={styles.inputField}
+                placeholder="Ghi chú"
+                value={note}
+                onChangeText={setNote}
               />
             </View>
-          </View>
-        </Modal>
-      </ScrollView>
+          )}
+
+          {/* Date Pickers */}
+          {showFromDatePicker && (
+            <DateTimePicker
+              value={fromDate}
+              mode="date"
+              display={Platform.OS === "ios" ? "inline" : "default"}
+              onChange={onChangeFromDate}
+            />
+          )}
+          {showToDatePicker && (
+            <DateTimePicker
+              value={toDate}
+              mode="date"
+              display={Platform.OS === "ios" ? "inline" : "default"}
+              onChange={onChangeToDate}
+            />
+          )}
+
+          {/* Category Modal */}
+          <Modal visible={showCategoryModal} transparent animationType="slide">
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Chọn loại ngân sách</Text>
+                <FlatList
+                  data={categories}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={styles.modalItem}
+                      onPress={() => {
+                        setCategory(item);
+                        setShowCategoryModal(false);
+                      }}
+                    >
+                      <Text style={styles.modalItemText}>{item}</Text>
+                    </TouchableOpacity>
+                  )}
+                  keyExtractor={(item) => item}
+                />
+                <TouchableOpacity
+                  style={styles.closeModalButton}
+                  onPress={() => setShowCategoryModal(false)}
+                >
+                  <Text style={styles.closeModalText}>Đóng</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };
 
-export default BudgetScreen;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f4f6f9",
+  },
+  background: {
+    flex: 1,
+    backgroundColor: "#f0f4f8",
   },
   scrollContainer: {
-    padding: 16,
+    padding: 20,
+    paddingBottom: 40,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    backgroundColor: "#4CAF50",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
     marginBottom: 20,
   },
   headerText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#fff",
+    flex: 1,
+    marginHorizontal: 12,
+    textAlign: "center",
+  },
+  iconButton: {
+    padding: 8,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 10,
+  },
+  saveButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    elevation: 3,
   },
   saveText: {
-    color: "#007bff",
-    fontWeight: "bold",
-    fontSize: 18
+    color: "#4CAF50",
+    fontSize: 14,
+    fontWeight: "600",
   },
-  input: {
+  moneyInputContainer: {
     backgroundColor: "#fff",
-    padding: 14,
-    fontSize: 16,
-    borderRadius: 10,
-    marginVertical: 6,
+    borderRadius: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 20,
+    marginBottom: 20,
+    elevation: 4,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowRadius: 4,
+  },
+  moneyInput: {
+    flex: 1,
+    fontSize: 26,
+    fontWeight: "600",
+    color: "#333",
+  },
+  currencyText: {
+    fontSize: 20,
+    fontWeight: "500",
+    color: "#4CAF50",
   },
   toggleButton: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    backgroundColor: "#2196F3",
+    paddingVertical: 12,
+    borderRadius: 20,
     alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 14,
-    borderRadius: 10,
-    marginVertical: 6,
+    elevation: 3,
+    marginBottom: 20,
   },
-  toggleText: {
+  toggleButtonText: {
+    color: "#fff",
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
   },
-  detailsContainer: {
+  detailsCard: {
     backgroundColor: "#fff",
-    padding: 14,
-    borderRadius: 10,
-    marginVertical: 6,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    elevation: 4,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowRadius: 4,
+  },
+  inputField: {
+    backgroundColor: "#f8f9fa",
+    borderRadius: 12,
+    padding: 14,
+    fontSize: 16,
+    color: "#333",
+    marginVertical: 8,
+    elevation: 1,
   },
   modalOverlay: {
     flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
   },
-  modalContainer: {
+  modalContent: {
     backgroundColor: "#fff",
+    borderRadius: 16,
     padding: 20,
-    borderRadius: 10,
-    width: "80%",
+    width: "85%",
+    maxHeight: "70%",
+    elevation: 5,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#333",
+    marginBottom: 16,
   },
   modalItem: {
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    borderBottomColor: "#eee",
   },
-  modalText: {
+  modalItemText: {
     fontSize: 16,
+    color: "#333",
+  },
+  closeModalButton: {
+    marginTop: 16,
+    paddingVertical: 12,
+    backgroundColor: "#2196F3",
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  closeModalText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#4CAF50",
+  },
+  loadingText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "500",
   },
 });
+
+export default BudgetScreen;

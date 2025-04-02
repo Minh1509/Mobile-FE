@@ -6,12 +6,17 @@ type ExpenseComponentV2Props = {
   icon: string;
   text: string;
   onPress: () => void;
+  style?: object;
 };
 
-const ExpenseComponentV2: React.FC<ExpenseComponentV2Props> = ({ icon, text, onPress }) => {
+const ExpenseComponentV2: React.FC<ExpenseComponentV2Props> = ({ icon, text, onPress, style }) => {
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
-      <MaterialCommunityIcons name={icon} size={24} color="#007bff" style={styles.icon} />
+    <TouchableOpacity
+      style={[styles.container, style]}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
+      <MaterialCommunityIcons name={icon} size={24} color="#fff" style={styles.icon} />
       <Text style={styles.text}>{text}</Text>
     </TouchableOpacity>
   );
@@ -23,23 +28,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f8f9fa",
-    padding: 12,
-    borderRadius: 10,
-    marginVertical: 6,
+    backgroundColor: "#4CAF50", // Màu xanh lá đơn giản thay gradient
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginHorizontal: 6,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },  
-    paddingVertical: 10,  
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2, // Hiệu ứng đổ bóng trên Android
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   icon: {
-    marginRight: 10,
+    marginRight: 8,
   },
   text: {
     fontSize: 16,
-    color: "#333",
+    fontWeight: "600",
+    color: "#fff",
   },
 });
 
