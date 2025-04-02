@@ -1,6 +1,7 @@
 import { db } from '@/firebase_config.env'; // Đảm bảo file này export Firestore instance
 import { addDoc, collection, DocumentData, getDocs, query, serverTimestamp, where } from 'firebase/firestore';
 import { json2csv } from 'json-2-csv'; // Giữ nguyên theo yêu cầu, nhưng có thể gây lỗi trong React Native
+import { formatDate } from '../utils/normalizeDate';
 
 export class ReportService {
     // Hàm tính toán báo cáo ngân sách
@@ -15,8 +16,8 @@ export class ReportService {
         const transactionsRef = collection(db, 'transactions');
         const q = query(
             transactionsRef,
-            where('date', '>=', startOfMonth),
-            where('date', '<=', endOfMonth)
+            where('date', '>=', formatDate(startOfMonth)),
+            where('date', '<=', formatDate(endOfMonth))
         );
 
         const transactionsSnapshot = await getDocs(q);

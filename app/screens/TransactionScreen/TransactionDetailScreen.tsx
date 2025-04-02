@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { getCategoryIcon } from '@/app/utils/GetCategoryIcon';
 import { Header } from '@/app/Components/Header';
 import { mainStyles } from '@/app/styles';
-import VNDFormat from '@/app/utils/MoneyParse';
+import { VNDFormat } from '@/app/utils/MoneyParse';
 import { TransactionType, PayMethod, ITransaction } from '@/app/interface/Transaction';
 import { TransactionService } from '@/app/services/transaction.service'; // Thêm hàm xóa giao dịch
 
