@@ -3,9 +3,9 @@ export enum TransactionType {
     INCOME = 'income',
 }
 export enum PayMethod {
-    CASH = "cash",
-    CARD = "card",
-    BANK_TRANSFER = "bank_transfer",
+    CASH = "Tiền mặt",
+    CARD = "Thẻ tín dụng",
+    BANK_TRANSFER = "Ví điện tử",
 }
 export interface ITransaction {
     id: string;

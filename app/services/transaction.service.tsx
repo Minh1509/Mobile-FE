@@ -40,17 +40,30 @@ export class TransactionService {
         }
     }
 
-    static async updateTransaction(id: string, transaction: Partial<ITransaction>): Promise<boolean> {
+    static async updateTransaction(id: string, transaction: Partial<ITransaction>): Promise<{ success: boolean; error?: string }> {
         try {
             const auth = getAuth();
             const user = auth.currentUser;
-            if (!user) return false;
+            if (!user) {
+                return { success: false, error: "Người dùng chưa đăng nhập." };
+            }
 
-            await updateDoc(doc(db, "transactions", id), { ...transaction, userId: user.uid });
-            return true;
-        } catch (error) {
-            console.error("Error updating transaction:", error);
-            return false;
+            const transactionRef = doc(db, "transactions", id);
+            const transactionSnap = await getDoc(transactionRef);
+            if (!transactionSnap.exists()) {
+                return { success: false, error: "Giao dịch không tồn tại." };
+            }
+
+            const transactionData = transactionSnap.data() as ITransaction;
+            if (transactionData.userId !== user.uid) {
+                return { success: false, error: "Bạn không có quyền chỉnh sửa giao dịch này." };
+            }
+
+            await updateDoc(transactionRef, { ...transaction, userId: user.uid });
+            return { success: true };
+        } catch (error: any) {
+            console.error("Lỗi khi cập nhật giao dịch:", error.message || error);
+            return { success: false, error: error.message || "Lỗi không xác định khi cập nhật giao dịch." };
         }
     }
 
