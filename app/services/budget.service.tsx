@@ -1,5 +1,5 @@
 import { db } from "@/firebase_config.env";
-import { collection, addDoc, Timestamp, getDocs } from "firebase/firestore";
+import { collection, addDoc, Timestamp, getDocs, serverTimestamp } from "firebase/firestore";
 import { ITransaction, TransactionType } from "../interface/Transaction";
 import { ICategory } from "../interface/Category";
 
@@ -9,8 +9,8 @@ export const addIncome = async (income: Omit<ITransaction, 'id' | 'type' | 'crea
         const transactionData: Omit<ITransaction, 'id'> = {
             ...income,
             type: TransactionType.INCOME,
-            createdAt: Timestamp.fromDate(new Date()).toDate().toISOString(),
-            updatedAt: Timestamp.fromDate(new Date()).toDate().toISOString(),
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
         };
 
         const docRef = await addDoc(collection(db, "transactions"), transactionData);
@@ -28,8 +28,8 @@ export const addExpense = async (expense: Omit<ITransaction, 'id' | 'type' | 'cr
         const transactionData: Omit<ITransaction, 'id'> = {
             ...expense,
             type: TransactionType.EXPENSE,
-            createdAt: Timestamp.fromDate(new Date()).toDate().toISOString(),
-            updatedAt: Timestamp.fromDate(new Date()).toDate().toISOString(),
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
         };
 
         const docRef = await addDoc(collection(db, "transactions"), transactionData);
