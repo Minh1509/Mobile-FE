@@ -19,8 +19,15 @@ const ProfileScreen: React.FC = () => {
   const [darkMode, setDarkMode] = useState(Appearance.getColorScheme() === "dark");
   const [isLoading, setIsLoading] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      // Nếu displayName tồn tại thì dùng, nếu không thì dùng email
+      setUserName(currentUser.displayName || currentUser.email || "Người dùng chưa đặt tên");
+    }
+
     const subscription = Appearance.addChangeListener(({ colorScheme }) => {
       setDarkMode(colorScheme === "dark");
     });
@@ -125,7 +132,7 @@ const ProfileScreen: React.FC = () => {
       backgroundColor: darkMode ? "#333" : "#e0e0e0",
     },
     username: {
-      fontSize: 20,
+      fontSize: 16,
       fontWeight: "bold",
       marginTop: 15,
       color: darkMode ? "#fff" : "#333",
@@ -196,7 +203,7 @@ const ProfileScreen: React.FC = () => {
           source={{ uri: "https://i.pravatar.cc/150?img=3" }}
           style={styles.avatar}
         />
-        <Text style={styles.username}>Tên Người Dùng</Text>
+        <Text style={styles.username}>{userName || "Đang tải..."}</Text>
       </View>
 
       {/* Phần Báo Cáo */}
