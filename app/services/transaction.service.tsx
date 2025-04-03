@@ -8,21 +8,28 @@ export class TransactionService {
         return query(collection(db, "transactions"), where("userId", "==", userId));
     }
 
+    // Hàm fetch giao dịch của người dùng
     static async fetchUserTransactions(): Promise<ITransaction[] | null> {
         try {
             const auth = getAuth();
             const user = auth.currentUser;
-            if (!user) return null;
+            if (!user) {
+                console.error("Người dùng chưa đăng nhập.");
+                return null;
+            }
 
+            // Lấy dữ liệu giao dịch của người dùng
             const q = this.getTransactionsCollection(user.uid);
             const querySnapshot = await getDocs(q);
+
+            // Chuyển đổi dữ liệu từ snapshot thành mảng giao dịch
             return querySnapshot.docs.map((doc) => ({
                 id: doc.id,
                 ...doc.data(),
             })) as ITransaction[];
         } catch (error) {
-            console.error("Lỗi khi lấy dữ liệu:", error);
-            return null;
+            console.error("Lỗi khi lấy dữ liệu giao dịch:", error);
+            return null; // Có thể trả về null hoặc một thông báo lỗi chi tiết hơn tùy theo yêu cầu
         }
     }
 
