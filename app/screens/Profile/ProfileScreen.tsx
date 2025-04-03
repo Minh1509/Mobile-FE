@@ -88,13 +88,31 @@ const ProfileScreen: React.FC = () => {
       const csvData = await ReportService.exportCsv();
       if (!csvData) throw new Error("Dữ liệu CSV rỗng");
 
+      // Thêm BOM (Byte Order Mark) để Excel nhận diện UTF-8
+      const BOM = "\uFEFF";
+      const csvWithBOM = BOM + csvData;
+
       const tempFilePath = FileSystem.documentDirectory + "reports.csv";
-      await FileSystem.writeAsStringAsync(tempFilePath, csvData, { encoding: FileSystem.EncodingType.UTF8 });
+
+      // Sử dụng UTF-8 encoding cho nội dung tiếng Việt
+      await FileSystem.writeAsStringAsync(tempFilePath, csvWithBOM, {
+        encoding: FileSystem.EncodingType.UTF8
+      });
 
       if (Platform.OS === 'android') {
+        // Lưu file vào thư mục Downloads
         const asset = await MediaLibrary.createAssetAsync(tempFilePath);
         await MediaLibrary.createAlbumAsync("Downloads", asset, false);
-        Alert.alert("Thành công", "Báo cáo CSV đã được lưu thành công vào thư mục Downloads!");
+
+        Alert.alert(
+          "Thành công",
+          "Báo cáo CSV đã được lưu thành công vào thư mục Downloads!",
+          [
+            {
+              text: "OK"
+            }
+          ]
+        );
       } else {
         const downloadDir = FileSystem.documentDirectory + "Download/";
         await FileSystem.makeDirectoryAsync(downloadDir, { intermediates: true });
