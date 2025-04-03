@@ -4717,6 +4717,11 @@ expo-linking@*, expo-linking@~7.0.5:
     expo-constants "~17.0.5"
     invariant "^2.2.4"
 
+expo-media-library@^17.0.6:
+  version "17.0.6"
+  resolved "https://registry.npmjs.org/expo-media-library/-/expo-media-library-17.0.6.tgz"
+  integrity sha512-LUnfrddmee1xLOkyG2NN1l9xQbtvMX3fbM1brEGHg0SKSndvjod3FQdhTzZEYAariqW2RSxQR8v1IsheIoLQXg==
+
 expo-modules-autolinking@2.0.8:
   version "2.0.8"
   resolved "https://registry.npmjs.org/expo-modules-autolinking/-/expo-modules-autolinking-2.0.8.tgz"
@@ -6932,6 +6937,7 @@ mkdirp@^1.0.4:
     expo-image-picker "~16.0.6"
     expo-linking "~7.0.5"
     expo-router "~4.0.15"
+    expo-sharing "^13.0.1"
     expo-splash-screen "~0.29.22"
     expo-status-bar "~2.0.1"
     expo-symbols "~0.2.2"
