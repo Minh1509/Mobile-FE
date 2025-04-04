@@ -27,6 +27,11 @@ interface Budget {
   endDate: string;
 }
 
+interface Warning {
+  message: string;
+  level: 'yellow' | 'red'; // Mức độ cảnh báo
+}
+
 const parseDate = (dateStr: string): Date => {
   const [day, month, year] = dateStr.split('/').map(Number);
   return new Date(year, month - 1, day);
@@ -41,7 +46,7 @@ const HomeScreen = () => {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [categorySummaries, setCategorySummaries] = useState<CategorySummary[]>([]);
   const [balance, setBalance] = useState({ start: 0, end: 0, difference: 0 });
-  const [warnings, setWarnings] = useState<string[]>([]);
+  const [warnings, setWarnings] = useState<Warning[]>([]);
 
   useEffect(() => {
     if (loading || !transactions.length || !userId) return;
@@ -85,7 +90,7 @@ const HomeScreen = () => {
     const checkBudgetWarnings = async () => {
       const budgets = await getBudgets(userId);
       const expenses = await getExpenses(userId);
-      const newWarnings: string[] = [];
+      const newWarnings: Warning[] = [];
 
       console.log('Budgets:', budgets);
       console.log('Expenses:', expenses);
@@ -105,14 +110,22 @@ const HomeScreen = () => {
           .reduce((sum, e) => sum + e.amount, 0);
 
         console.log(`Total Budget: ${totalBudget.amountLimit}, Total Spent: ${totalSpent}, Threshold: ${totalBudget.amountLimit * 0.9}`);
-        if (totalSpent > totalBudget.amountLimit * 0.9) {
-          newWarnings.push(`"Tổng" đã vượt 90% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(totalBudget.amountLimit)}) trong khoảng ${totalBudget.startDate} - ${totalBudget.endDate}`);
+        if (totalSpent > totalBudget.amountLimit) {
+          newWarnings.push({
+            message: `"Tổng" đã vượt 100% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(totalBudget.amountLimit)}) trong khoảng ${totalBudget.startDate} - ${totalBudget.endDate}`,
+            level: 'red',
+          });
+        } else if (totalSpent > totalBudget.amountLimit * 0.9) {
+          newWarnings.push({
+            message: `"Tổng" đã vượt 90% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(totalBudget.amountLimit)}) trong khoảng ${totalBudget.startDate} - ${totalBudget.endDate}`,
+            level: 'yellow',
+          });
         }
       }
 
       // Kiểm tra từng ngân sách cụ thể
       budgets
-        .filter(b => b.category !== "Tổng") // Loại trừ "Tổng" để tránh trùng lặp
+        .filter(b => b.category !== "Tổng")
         .forEach(budget => {
           const budgetStart = parseDate(budget.startDate);
           const budgetEnd = parseDate(budget.endDate);
@@ -130,8 +143,16 @@ const HomeScreen = () => {
             .reduce((sum, e) => sum + e.amount, 0);
 
           console.log(`Category: ${budget.category}, Budget: ${budget.amountLimit}, Spent: ${totalSpent}, Threshold: ${budget.amountLimit * 0.9}`);
-          if (totalSpent > budget.amountLimit * 0.9) {
-            newWarnings.push(`"${budget.category}" đã vượt 90% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(budget.amountLimit)}) trong khoảng ${budget.startDate} - ${budget.endDate}`);
+          if (totalSpent > budget.amountLimit) {
+            newWarnings.push({
+              message: `"${budget.category}" đã vượt 100% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(budget.amountLimit)}) trong khoảng ${budget.startDate} - ${budget.endDate}`,
+              level: 'red',
+            });
+          } else if (totalSpent > budget.amountLimit * 0.9) {
+            newWarnings.push({
+              message: `"${budget.category}" đã vượt 90% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(budget.amountLimit)}) trong khoảng ${budget.startDate} - ${budget.endDate}`,
+              level: 'yellow',
+            });
           }
         });
 
@@ -188,16 +209,32 @@ const HomeScreen = () => {
           </Text>
         </View>
       </View>
-      {warnings.length > 0 && (
-        <View style={styles.warningContainer}>
-          <Ionicons name="warning" size={24} color="#FF6347" style={styles.warningIcon} />
+      {warnings.length > 0 && warnings.map((warning, index) => (
+        <View
+          key={index}
+          style={[
+            styles.warningContainer,
+            { backgroundColor: warning.level === 'yellow' ? '#FFF3E0' : '#FFF3F3' }, // Vàng nhạt hoặc đỏ nhạt
+          ]}
+        >
+          <Ionicons
+            name="warning"
+            size={24}
+            color={warning.level === 'yellow' ? '#FFA500' : '#FF6347'} // Vàng đậm hoặc đỏ
+            style={styles.warningIcon}
+          />
           <View style={styles.warningTextContainer}>
-            {warnings.map((warning, index) => (
-              <Text key={index} style={styles.warningText}>{warning}</Text>
-            ))}
+            <Text
+              style={[
+                styles.warningText,
+                { color: warning.level === 'yellow' ? '#FFA500' : '#FF6347' }, // Vàng đậm hoặc đỏ
+              ]}
+            >
+              {warning.message}
+            </Text>
           </View>
         </View>
-      )}
+      ))}
       <Text style={styles.sectionHeader}>Danh sách chi tiêu hàng tháng</Text>
       <FlatList
         data={categorySummaries}
@@ -222,7 +259,7 @@ const HomeScreen = () => {
         )}
         keyExtractor={(item) => item.category}
         contentContainerStyle={styles.expenseList}
-        scrollEnabled={false} // Tắt cuộn riêng của FlatList, để ScrollView xử lý
+        scrollEnabled={false}
       />
     </ScrollView>
   );
@@ -242,7 +279,6 @@ const styles = StyleSheet.create({
   balanceDifference: { fontSize: 18, fontWeight: 'bold' },
   warningContainer: {
     flexDirection: 'row',
-    backgroundColor: '#FFF3F3',
     padding: 16,
     marginHorizontal: 16,
     marginBottom: 16,
@@ -251,7 +287,7 @@ const styles = StyleSheet.create({
   },
   warningIcon: { marginRight: 12 },
   warningTextContainer: { flex: 1 },
-  warningText: { fontSize: 14, color: '#FF6347', marginBottom: 4 },
+  warningText: { fontSize: 14, marginBottom: 4 },
   sectionHeader: { fontSize: 20, fontWeight: 'bold', marginVertical: 16, marginHorizontal: 16, color: '#333' },
   expenseList: { paddingHorizontal: 16, paddingBottom: 16 },
   expenseItemContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', padding: 16, marginBottom: 10, borderRadius: 8 },
