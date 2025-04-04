@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -90,28 +90,50 @@ const HomeScreen = () => {
       console.log('Budgets:', budgets);
       console.log('Expenses:', expenses);
 
-      // Kiểm tra từng ngân sách
-      budgets.forEach(budget => {
-        const budgetStart = parseDate(budget.startDate);
-        const budgetEnd = parseDate(budget.endDate);
-        budgetEnd.setHours(23, 59, 59, 999); // Đảm bảo bao gồm cả cuối ngày
-
-        console.log(`Checking budget: ${budget.category}, Range: ${budgetStart.toISOString()} - ${budgetEnd.toISOString()}`);
+      // Kiểm tra ngân sách "Tổng" (tất cả category)
+      const totalBudget = budgets.find(b => b.category === "Tổng");
+      if (totalBudget) {
+        const budgetStart = parseDate(totalBudget.startDate);
+        const budgetEnd = parseDate(totalBudget.endDate);
+        budgetEnd.setHours(23, 59, 59, 999);
 
         const totalSpent = expenses
           .filter(e => {
             const expenseDate = parseDate(e.date);
-            return e.category === budget.category && 
-                   expenseDate >= budgetStart && 
-                   expenseDate <= budgetEnd;
+            return expenseDate >= budgetStart && expenseDate <= budgetEnd;
           })
           .reduce((sum, e) => sum + e.amount, 0);
 
-        console.log(`Category: ${budget.category}, Budget: ${budget.amountLimit}, Spent: ${totalSpent}, Threshold: ${budget.amountLimit * 0.9}`);
-        if (totalSpent > budget.amountLimit * 0.9) {
-          newWarnings.push(`"${budget.category}" đã vượt 90% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(budget.amountLimit)}) trong khoảng ${budget.startDate} - ${budget.endDate}`);
+        console.log(`Total Budget: ${totalBudget.amountLimit}, Total Spent: ${totalSpent}, Threshold: ${totalBudget.amountLimit * 0.9}`);
+        if (totalSpent > totalBudget.amountLimit * 0.9) {
+          newWarnings.push(`"Tổng" đã vượt 90% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(totalBudget.amountLimit)}) trong khoảng ${totalBudget.startDate} - ${totalBudget.endDate}`);
         }
-      });
+      }
+
+      // Kiểm tra từng ngân sách cụ thể
+      budgets
+        .filter(b => b.category !== "Tổng") // Loại trừ "Tổng" để tránh trùng lặp
+        .forEach(budget => {
+          const budgetStart = parseDate(budget.startDate);
+          const budgetEnd = parseDate(budget.endDate);
+          budgetEnd.setHours(23, 59, 59, 999);
+
+          console.log(`Checking budget: ${budget.category}, Range: ${budgetStart.toISOString()} - ${budgetEnd.toISOString()}`);
+
+          const totalSpent = expenses
+            .filter(e => {
+              const expenseDate = parseDate(e.date);
+              return e.category === budget.category && 
+                     expenseDate >= budgetStart && 
+                     expenseDate <= budgetEnd;
+            })
+            .reduce((sum, e) => sum + e.amount, 0);
+
+          console.log(`Category: ${budget.category}, Budget: ${budget.amountLimit}, Spent: ${totalSpent}, Threshold: ${budget.amountLimit * 0.9}`);
+          if (totalSpent > budget.amountLimit * 0.9) {
+            newWarnings.push(`"${budget.category}" đã vượt 90% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(budget.amountLimit)}) trong khoảng ${budget.startDate} - ${budget.endDate}`);
+          }
+        });
 
       setWarnings(newWarnings);
       console.log('Warnings:', newWarnings);
@@ -137,7 +159,7 @@ const HomeScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.tabContainer}>
         <TouchableOpacity style={styles.tab} onPress={() => handleMonthChange(-1)}>
           <Text style={styles.tabText}>Tháng trước</Text>
@@ -200,8 +222,9 @@ const HomeScreen = () => {
         )}
         keyExtractor={(item) => item.category}
         contentContainerStyle={styles.expenseList}
+        scrollEnabled={false} // Tắt cuộn riêng của FlatList, để ScrollView xử lý
       />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -230,7 +253,7 @@ const styles = StyleSheet.create({
   warningTextContainer: { flex: 1 },
   warningText: { fontSize: 14, color: '#FF6347', marginBottom: 4 },
   sectionHeader: { fontSize: 20, fontWeight: 'bold', marginVertical: 16, marginHorizontal: 16, color: '#333' },
-  expenseList: { paddingHorizontal: 16 },
+  expenseList: { paddingHorizontal: 16, paddingBottom: 16 },
   expenseItemContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', padding: 16, marginBottom: 10, borderRadius: 8 },
   iconContainer: { marginRight: 16 },
   categoryImage: { width: 24, height: 24 },
