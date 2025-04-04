@@ -1,3 +1,5 @@
+import { FieldValue } from "firebase/firestore";
+
 export enum TransactionType {
     EXPENSE = 'expense',
     INCOME = 'income',
@@ -20,6 +22,6 @@ export interface ITransaction {
     location: string;
     image: string;
     type: TransactionType;
-    createdAt?: string; // Thêm createdAt (tùy chọn vì được tạo tự động)
-    updatedAt?: string; // Thêm updatedAt (tùy chọn vì được tạo tự động)
+    createdAt?: string | FieldValue; // Thêm createdAt (tùy chọn vì được tạo tự động)
+    updatedAt?: string | FieldValue; // Thêm updatedAt (tùy chọn vì được tạo tự động)
 }

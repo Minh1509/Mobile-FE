@@ -24,6 +24,7 @@ import { RootStackParamList } from "@/app/Types/types";
 import { ITransaction } from "@/app/interface/Transaction";
 import { TransactionService } from '@/app/services/transaction.service'; // Import TransactionService
 import { PayMethod } from "@/app/interface/Transaction";
+import { serverTimestamp } from "firebase/firestore";
 
 type EditTransactionScreenNavigationProp = StackNavigationProp<RootStackParamList, 'EditTransaction'>;
 type EditTransactionScreenRouteProp = RouteProp<RootStackParamList, 'EditTransaction'>;
@@ -159,7 +160,8 @@ const EditTransactionScreen = () => {
             location,
             paymentMethod,
             note,
-            image: imageUri || ""
+            image: imageUri || "",
+            updatedAt: serverTimestamp()
         };
 
         try {
