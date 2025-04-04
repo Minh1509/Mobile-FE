@@ -91,73 +91,85 @@ const HomeScreen = () => {
       const budgets = await getBudgets(userId);
       const expenses = await getExpenses(userId);
       const newWarnings: Warning[] = [];
-
-      console.log('Budgets:', budgets);
-      console.log('Expenses:', expenses);
-
-      // Kiểm tra ngân sách "Tổng" (tất cả category)
-      const totalBudget = budgets.find(b => b.category === "Tổng");
+    
+      // Lọc budgets chỉ lấy những ngân sách áp dụng cho tháng/năm hiện tại
+      const currentBudgets = budgets.filter(budget => {
+        const budgetStart = parseDate(budget.startDate);
+        const budgetEnd = parseDate(budget.endDate);
+        budgetEnd.setHours(23, 59, 59, 999);
+    
+        const startMonth = budgetStart.getMonth() + 1;
+        const startYear = budgetStart.getFullYear();
+        const endMonth = budgetEnd.getMonth() + 1;
+        const endYear = budgetEnd.getFullYear();
+    
+        // Kiểm tra xem tháng/năm hiện tại có nằm trong khoảng startDate và endDate không
+        return (
+          (startYear < currentYear || (startYear === currentYear && startMonth <= currentMonth)) &&
+          (endYear > currentYear || (endYear === currentYear && endMonth >= currentMonth))
+        );
+      });
+    
+      // Kiểm tra ngân sách "Tổng" (nếu có)
+      const totalBudget = currentBudgets.find(b => b.category === "Tổng");
       if (totalBudget) {
         const budgetStart = parseDate(totalBudget.startDate);
         const budgetEnd = parseDate(totalBudget.endDate);
         budgetEnd.setHours(23, 59, 59, 999);
-
+    
         const totalSpent = expenses
           .filter(e => {
             const expenseDate = parseDate(e.date);
             return expenseDate >= budgetStart && expenseDate <= budgetEnd;
           })
           .reduce((sum, e) => sum + e.amount, 0);
-
-        console.log(`Total Budget: ${totalBudget.amountLimit}, Total Spent: ${totalSpent}, Threshold: ${totalBudget.amountLimit * 0.9}`);
+    
         if (totalSpent > totalBudget.amountLimit) {
           newWarnings.push({
-            message: `"Tổng" đã vượt 100% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(totalBudget.amountLimit)}) trong khoảng ${totalBudget.startDate} - ${totalBudget.endDate}`,
+            message: `"Tổng" đã vượt 100% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(totalBudget.amountLimit)}) từ ${totalBudget.startDate} đến ${totalBudget.endDate}`,
             level: 'red',
           });
         } else if (totalSpent > totalBudget.amountLimit * 0.9) {
           newWarnings.push({
-            message: `"Tổng" đã vượt 90% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(totalBudget.amountLimit)}) trong khoảng ${totalBudget.startDate} - ${totalBudget.endDate}`,
+            message: `"Tổng" đã vượt 90% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(totalBudget.amountLimit)}) từ ${totalBudget.startDate} đến ${totalBudget.endDate}`,
             level: 'yellow',
           });
         }
       }
-
-      // Kiểm tra từng ngân sách cụ thể
-      budgets
+    
+      // Kiểm tra từng ngân sách cụ thể (ngoại trừ "Tổng")
+      currentBudgets
         .filter(b => b.category !== "Tổng")
         .forEach(budget => {
           const budgetStart = parseDate(budget.startDate);
           const budgetEnd = parseDate(budget.endDate);
           budgetEnd.setHours(23, 59, 59, 999);
-
-          console.log(`Checking budget: ${budget.category}, Range: ${budgetStart.toISOString()} - ${budgetEnd.toISOString()}`);
-
+    
           const totalSpent = expenses
             .filter(e => {
               const expenseDate = parseDate(e.date);
-              return e.category === budget.category && 
-                     expenseDate >= budgetStart && 
-                     expenseDate <= budgetEnd;
+              return (
+                e.category === budget.category &&
+                expenseDate >= budgetStart &&
+                expenseDate <= budgetEnd
+              );
             })
             .reduce((sum, e) => sum + e.amount, 0);
-
-          console.log(`Category: ${budget.category}, Budget: ${budget.amountLimit}, Spent: ${totalSpent}, Threshold: ${budget.amountLimit * 0.9}`);
+    
           if (totalSpent > budget.amountLimit) {
             newWarnings.push({
-              message: `"${budget.category}" đã vượt 100% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(budget.amountLimit)}) trong khoảng ${budget.startDate} - ${budget.endDate}`,
+              message: `"${budget.category}" đã vượt 100% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(budget.amountLimit)}) từ ${budget.startDate} đến ${budget.endDate}`,
               level: 'red',
             });
           } else if (totalSpent > budget.amountLimit * 0.9) {
             newWarnings.push({
-              message: `"${budget.category}" đã vượt 90% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(budget.amountLimit)}) trong khoảng ${budget.startDate} - ${budget.endDate}`,
+              message: `"${budget.category}" đã vượt 90% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(budget.amountLimit)}) từ ${budget.startDate} đến ${budget.endDate}`,
               level: 'yellow',
             });
           }
         });
-
+    
       setWarnings(newWarnings);
-      console.log('Warnings:', newWarnings);
     };
 
     checkBudgetWarnings();
