@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native"; // Import useFocusEffect
 import { TransactionService } from "@/app/services/transaction.service";
 import { ITransaction } from "@/app/interface/Transaction";
 import { useUserAuth } from "@/app/hooks/userAuth";
@@ -6,31 +7,32 @@ import { useUserAuth } from "@/app/hooks/userAuth";
 export const useTransactions = () => {
     const { userId, loading: authLoading } = useUserAuth();
     const [transactions, setTransactions] = useState<ITransaction[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState<boolean>(true);
 
-    // Hàm fetch dữ liệu giao dịch
     const fetchTransactions = useCallback(async () => {
-        if (!userId || authLoading) return; // Kiểm tra trước khi gọi API
+        if (!userId || authLoading) return;
 
         setLoading(true);
         try {
-            const data = await TransactionService.fetchUserTransactions(); // Truyền userId vào fetchUserTransactions
-            if (data && JSON.stringify(data) !== JSON.stringify(transactions)) {
-                setTransactions(data); // Chỉ cập nhật nếu dữ liệu khác
+            const data = await TransactionService.fetchUserTransactions();
+            if (Array.isArray(data)) {
+                setTransactions(data);
             }
         } catch (error) {
             console.error("Error fetching transactions:", error);
         } finally {
             setLoading(false);
         }
-    }, [userId, authLoading, transactions]);
+    }, [userId, authLoading]);
 
-    // Fetch lại khi userId hoặc authLoading thay đổi
-    useEffect(() => {
-        if (userId && !authLoading) {
-            fetchTransactions(); // Fetch dữ liệu khi userId hợp lệ và không còn loading
-        }
-    }, [userId, authLoading, fetchTransactions]);
+    // Use useFocusEffect to trigger data fetch when the screen is focused
+    useFocusEffect(
+        useCallback(() => {
+            if (userId && !authLoading) {
+                fetchTransactions();
+            }
+        }, [userId, authLoading, fetchTransactions])
+    );
 
     return { transactions, loading };
 };
