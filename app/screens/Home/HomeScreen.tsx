@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ScrollView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -10,6 +10,7 @@ import { VNDFormat } from '@/app/utils/MoneyParse';
 import { getCategoryIcon } from '@/app/utils/GetCategoryIcon';
 import { getBudgets, getExpenses } from '@/app/services/budget.service';
 import { useUserAuth } from '@/app/hooks/userAuth';
+import * as Notifications from 'expo-notifications';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -29,13 +30,35 @@ interface Budget {
 
 interface Warning {
   message: string;
-  level: 'yellow' | 'red'; // Mức độ cảnh báo
+  level: 'yellow' | 'red';
 }
 
 const parseDate = (dateStr: string): Date => {
   const [day, month, year] = dateStr.split('/').map(Number);
   return new Date(year, month - 1, day);
 };
+
+// Cấu hình thông báo
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
+// Hàm gửi thông báo cục bộ
+async function scheduleNotification(warning: Warning) {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: warning.level === 'red' ? 'Cảnh báo ngân sách nghiêm trọng' : 'Cảnh báo ngân sách',
+      body: warning.message,
+      sound: 'default',
+      priority: 'high', // Đảm bảo hiển thị trên Android
+    },
+    trigger: null, // null để gửi ngay lập tức
+  });
+}
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -47,8 +70,25 @@ const HomeScreen = () => {
   const [categorySummaries, setCategorySummaries] = useState<CategorySummary[]>([]);
   const [balance, setBalance] = useState({ start: 0, end: 0, difference: 0 });
   const [warnings, setWarnings] = useState<Warning[]>([]);
+  const [prevWarnings, setPrevWarnings] = useState<Warning[]>([]);
 
   useEffect(() => {
+    // Yêu cầu quyền khi component mount
+    const setupNotifications = async () => {
+      const hasPermission = await requestPermissions();
+      if (!hasPermission) return;
+
+      if (Platform.OS === 'android') {
+        await Notifications.setNotificationChannelAsync('budget-warnings', {
+          name: 'Budget Warnings',
+          importance: Notifications.AndroidImportance.HIGH,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: '#FF231F7C',
+        });
+      }
+    };
+    setupNotifications();
+
     if (loading || !transactions.length || !userId) return;
 
     const filteredTransactions = transactions.filter(({ date }) => {
@@ -91,39 +131,36 @@ const HomeScreen = () => {
       const budgets = await getBudgets(userId);
       const expenses = await getExpenses(userId);
       const newWarnings: Warning[] = [];
-    
-      // Lọc budgets chỉ lấy những ngân sách áp dụng cho tháng/năm hiện tại
+
       const currentBudgets = budgets.filter(budget => {
         const budgetStart = parseDate(budget.startDate);
         const budgetEnd = parseDate(budget.endDate);
         budgetEnd.setHours(23, 59, 59, 999);
-    
+
         const startMonth = budgetStart.getMonth() + 1;
         const startYear = budgetStart.getFullYear();
         const endMonth = budgetEnd.getMonth() + 1;
         const endYear = budgetEnd.getFullYear();
-    
-        // Kiểm tra xem tháng/năm hiện tại có nằm trong khoảng startDate và endDate không
+
         return (
           (startYear < currentYear || (startYear === currentYear && startMonth <= currentMonth)) &&
           (endYear > currentYear || (endYear === currentYear && endMonth >= currentMonth))
         );
       });
-    
-      // Kiểm tra ngân sách "Tổng" (nếu có)
+
       const totalBudget = currentBudgets.find(b => b.category === "Tổng");
       if (totalBudget) {
         const budgetStart = parseDate(totalBudget.startDate);
         const budgetEnd = parseDate(totalBudget.endDate);
         budgetEnd.setHours(23, 59, 59, 999);
-    
+
         const totalSpent = expenses
           .filter(e => {
             const expenseDate = parseDate(e.date);
             return expenseDate >= budgetStart && expenseDate <= budgetEnd;
           })
           .reduce((sum, e) => sum + e.amount, 0);
-    
+
         if (totalSpent > totalBudget.amountLimit) {
           newWarnings.push({
             message: `"Tổng" đã vượt 100% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(totalBudget.amountLimit)}) từ ${totalBudget.startDate} đến ${totalBudget.endDate}`,
@@ -136,15 +173,14 @@ const HomeScreen = () => {
           });
         }
       }
-    
-      // Kiểm tra từng ngân sách cụ thể (ngoại trừ "Tổng")
+
       currentBudgets
         .filter(b => b.category !== "Tổng")
         .forEach(budget => {
           const budgetStart = parseDate(budget.startDate);
           const budgetEnd = parseDate(budget.endDate);
           budgetEnd.setHours(23, 59, 59, 999);
-    
+
           const totalSpent = expenses
             .filter(e => {
               const expenseDate = parseDate(e.date);
@@ -155,7 +191,7 @@ const HomeScreen = () => {
               );
             })
             .reduce((sum, e) => sum + e.amount, 0);
-    
+
           if (totalSpent > budget.amountLimit) {
             newWarnings.push({
               message: `"${budget.category}" đã vượt 100% ngân sách (${VNDFormat(totalSpent)}/${VNDFormat(budget.amountLimit)}) từ ${budget.startDate} đến ${budget.endDate}`,
@@ -168,8 +204,17 @@ const HomeScreen = () => {
             });
           }
         });
-    
+        const newUniqueWarnings = newWarnings.filter(
+          nw => !prevWarnings.some(pw => pw.message === nw.message)
+        );
+      
+      // Gửi thông báo cho từng cảnh báo mới
+      if (newUniqueWarnings.length > 0) {
+        newUniqueWarnings.forEach(warning => scheduleNotification(warning));
+      }
+
       setWarnings(newWarnings);
+      setPrevWarnings(newWarnings);
     };
 
     checkBudgetWarnings();
@@ -226,20 +271,20 @@ const HomeScreen = () => {
           key={index}
           style={[
             styles.warningContainer,
-            { backgroundColor: warning.level === 'yellow' ? '#FFF3E0' : '#FFF3F3' }, // Vàng nhạt hoặc đỏ nhạt
+            { backgroundColor: warning.level === 'yellow' ? '#FFF3E0' : '#FFF3F3' },
           ]}
         >
           <Ionicons
             name="warning"
             size={24}
-            color={warning.level === 'yellow' ? '#FFA500' : '#FF6347'} // Vàng đậm hoặc đỏ
+            color={warning.level === 'yellow' ? '#FFA500' : '#FF6347'}
             style={styles.warningIcon}
           />
           <View style={styles.warningTextContainer}>
             <Text
               style={[
                 styles.warningText,
-                { color: warning.level === 'yellow' ? '#FFA500' : '#FF6347' }, // Vàng đậm hoặc đỏ
+                { color: warning.level === 'yellow' ? '#FFA500' : '#FF6347' },
               ]}
             >
               {warning.message}
@@ -276,6 +321,16 @@ const HomeScreen = () => {
     </ScrollView>
   );
 };
+
+// Hàm yêu cầu quyền thông báo
+async function requestPermissions() {
+  const { status } = await Notifications.requestPermissionsAsync();
+  if (status !== 'granted') {
+    alert('Bạn cần cấp quyền để nhận thông báo!');
+    return false;
+  }
+  return true;
+}
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
