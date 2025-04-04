@@ -38,16 +38,27 @@ const BudgetScreen = () => {
   const [showToDatePicker, setShowToDatePicker] = useState(false);
   const [expanded, setExpanded] = useState(true);
 
-  const categories = ["Di chuyển", "Ăn uống", "Tiền điện", "Mua sắm", "Tiền nước", "Học tập", "Giải trí", "Thuê nhà", "Internet", "Khác"];
+  const categories = ["Tổng", "Tiền điện", "Thuê nhà", "Internet", "Di chuyển", "Giải trí", "Mua sắm", "Học tập", "Tiền nước", "Ăn uống", "Khác"];
 
   const onChangeFromDate = (event: any, selectedDate?: Date) => {
     setShowFromDatePicker(false);
-    if (selectedDate) setFromDate(selectedDate);
+    if (selectedDate) {
+      setFromDate(selectedDate);
+      // Đảm bảo fromDate không lớn hơn toDate
+      if (selectedDate > toDate) setToDate(selectedDate);
+    } 
   };
 
   const onChangeToDate = (event: any, selectedDate?: Date) => {
     setShowToDatePicker(false);
-    if (selectedDate) setToDate(selectedDate);
+    if (selectedDate) {
+      // Đảm bảo toDate không nhỏ hơn fromDate
+      if (selectedDate < fromDate) {
+        Alert.alert("Lỗi", "Ngày kết thúc không thể nhỏ hơn ngày bắt đầu!");
+        return;
+      }
+      setToDate(selectedDate); 
+    } 
   };
 
   const handleSaveBudget = async () => {
@@ -55,14 +66,16 @@ const BudgetScreen = () => {
       Alert.alert("Lỗi", "Vui lòng nhập số tiền hợp lệ (lớn hơn 0)!");
       return;
     }
-    if (category === "Chọn loại ngân sách") {
-      Alert.alert("Lỗi", "Vui lòng chọn loại ngân sách!");
-      return;
-    }
     if (!userId) {
       Alert.alert("Lỗi", "Bạn cần đăng nhập để thêm ngân sách!");
       return;
     }
+    if (fromDate > toDate) {
+      Alert.alert("Lỗi", "Ngày bắt đầu không thể lớn hơn ngày kết thúc!");
+      return;
+    }
+    // Nếu không chọn category, mặc định là "Tổng"
+    const finalCategory = category === "Chọn loại ngân sách" ? "Tổng" : category;
 
     const budgetData = {
       userId,
@@ -75,7 +88,7 @@ const BudgetScreen = () => {
 
     try {
       await addBudget(budgetData);
-      Alert.alert("Thành công", "Ngân sách đã được lưu thành công!");
+      Alert.alert("Thành công", `Ngân sách cho "${finalCategory}" đã được lưu từ ${formatDate(fromDate)} đến ${formatDate(toDate)}!`);
       navigation.goBack();
     } catch (error) {
       console.error("Lỗi khi lưu ngân sách:", error);
