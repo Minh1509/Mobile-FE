@@ -17,6 +17,9 @@ import IncomeScreen from "../screens/Income/IncomeScreen";
 import BudgetScreen from "../screens/Budget/BudgetScreen";
 import UtilityScreen from "../screens/UtilityScreen/UtilityScreen";
 import ProfileScreen from "../screens/Profile/ProfileScreen";
+import CategoryAnalysisChartScreen from "@/app/screens/Chart/CategoryAnalysisChart/CategoryAnalysisChartScreen";
+import TrendChartScreen from "@/app/screens/Chart/TrendChart/TrendChartScreen";
+import IncomeAndExpenditureComparisonChart from "@/app/screens/Chart/IncomeAndExpenditureComparisonChart/IncomeAndExpenditureComparisonChart";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -43,6 +46,9 @@ export default function StackNavigator() {
       <Stack.Screen name="AddBudget" component={BudgetScreen} options={{ headerShown: false }}/>
       <Stack.Screen name="IncomeAndExpenditureChart" component={IncomeAndExpenditureChartScreen} options={{ headerShown: false }}/>
       <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false}}/>
+      <Stack.Screen name="CategoryAnalysisChart" component={CategoryAnalysisChartScreen} options={{ headerShown: false}}/>
+      <Stack.Screen name="TrendChart" component={TrendChartScreen} options={{ headerShown: false}}/>
+      <Stack.Screen name="IncomeAndExpenditureComparisonChart" component={IncomeAndExpenditureComparisonChart} options={{ headerShown: false}}/>
     </Stack.Navigator>
 
   );

@@ -23,9 +23,9 @@ interface UtilityItem {
 // Dữ liệu giả lập cho danh sách tiện ích
 const utilities: UtilityItem[] = [
     {id: 'IncomeAndExpenditureChart', title: 'Biểu đồ thu chi', icon: 'pie-chart'},
-    {id: '2', title: 'Biểu đồ phân tích theo danh mục', icon: 'git-network'},
-    {id: '3', title: 'Biểu đồ xu hướng', icon: 'bar-chart'},
-    {id: '4', title: 'Biểu đồ so sánh thu chi', icon: 'stats-chart'},
+    {id: 'CategoryAnalysisChart', title: 'Biểu đồ phân tích theo danh mục', icon: 'git-network'},
+    {id: 'TrendChart', title: 'Biểu đồ xu hướng', icon: 'bar-chart'},
+    {id: 'IncomeAndExpenditureComparisonChart', title: 'Biểu đồ so sánh thu chi', icon: 'stats-chart'},
     {id: 'AddExpense', title: 'Thêm chi tiêu', icon: 'cash-outline'},
     {id: 'AddIncome', title: 'Thêm thu nhập', icon: 'wallet-outline'},
     {id: 'AddBudget', title: 'Thiết lập ngân sách', icon: 'calculator-outline'},
@@ -38,6 +38,12 @@ const UtilityScreen = () => {
     const handleItemPress = (id: string) => {
         if (id === 'IncomeAndExpenditureChart') {
             navigation.navigate('IncomeAndExpenditureChart');
+        } else if (id === 'CategoryAnalysisChart') {
+            navigation.navigate('CategoryAnalysisChart');
+        } else if (id === 'TrendChart') {
+            navigation.navigate('TrendChart');
+        } else if (id === 'IncomeAndExpenditureComparisonChart') {
+            navigation.navigate('IncomeAndExpenditureComparisonChart');
         } else if (id === 'AddExpense') {
             navigation.navigate('AddExpense');
         } else if (id === 'AddIncome') {

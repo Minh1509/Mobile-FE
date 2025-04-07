@@ -1,34 +1,27 @@
-﻿// File: IncomeAndExpenditureChartScreen.tsx
-
-import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, Dimensions, FlatList} from 'react-native';
-import {VictoryChart} from 'victory-chart';
-import {VictoryAxis} from 'victory-axis';
-import {VictoryBar} from 'victory-bar';
-import {VictoryPie} from 'victory-pie';
-import {LineSegment} from 'victory-core';
-import {VictoryTooltip} from 'victory-tooltip';
+﻿import React, {useEffect, useState} from 'react';
+import {TouchableOpacity, FlatList, Dimensions} from 'react-native';
+import {Box, HStack, Text, View} from "@gluestack-ui/themed";
+import {Pie, PolarChart, CartesianChart, Bar} from "victory-native";
+import {useFont, vec, LinearGradient} from "@shopify/react-native-skia";
 import {Ionicons} from '@expo/vector-icons';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useTransactions} from '@/app/hooks/useTransactions';
 import {ITransaction} from '@/app/interface/Transaction';
 import {RootStackParamList} from '@/app/Types/types';
-import {VNDKFormat, VNDFormat} from '@/app/utils/MoneyParse';
+import {VNDFormat, VNDKFormat} from '@/app/utils/MoneyParse';
 import styles from './IncomeAndExpenditureChartScreenStyles';
 
-// Định nghĩa kiểu cho navigation
+const space_mono = require('@/assets/fonts/SpaceMono-Regular.ttf'); // Thêm font
+
 type IncomeAndExpenditureChartNavigationProp = StackNavigationProp<RootStackParamList, 'IncomeAndExpenditureChart'>;
 
-// Hàm để lấy ngày, tháng, năm từ chuỗi ngày
 const getDateComponents = (date: string) => {
     const [day, month, year] = date.split('/').map(Number);
     return {day, month, year};
 };
 
-// Hàm tạo gradient màu
 const generateGradientColors = (startColor: string, endColor: string, steps: number) => {
-    // Nếu chỉ có 1 phần tử, trả về startColor
     if (steps <= 1) {
         return [startColor];
     }
@@ -59,8 +52,8 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
     const currentDate = new Date();
     const navigation = useNavigation<IncomeAndExpenditureChartNavigationProp>();
     const {transactions, loading} = useTransactions();
+    const font = useFont(space_mono, 12); // Thêm font cho trục
 
-    // Hàm định dạng ngày thành DD/MM/YYYY
     const formatDate = (date: Date): string => {
         const day = date.getDate().toString().padStart(2, '0');
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -68,11 +61,9 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
         return `${day}/${month}/${year}`;
     };
 
-    // State để theo dõi tháng/năm hiện tại
     const [currentMonth, setCurrentMonth] = useState<number>(currentDate.getMonth());
     const [currentYear, setCurrentYear] = useState<number>(currentDate.getFullYear());
 
-    // Tính ngày đầu tiên và cuối cùng của tháng hiện tại
     const startOfMonth = new Date(currentYear, currentMonth, 1);
     const endOfMonth = new Date(currentYear, currentMonth + 1, 0);
 
@@ -93,20 +84,19 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
     useEffect(() => {
         if (loading) return;
 
-        // Chuyển dateRange.start và dateRange.end thành Date để so sánh
         const {day: startDay, month: startMonth, year: startYear} = getDateComponents(dateRange.start);
         const {day: endDay, month: endMonth, year: endYear} = getDateComponents(dateRange.end);
         const startDate = new Date(startYear, startMonth - 1, startDay);
         const endDate = new Date(endYear, endMonth - 1, endDay);
 
-        // Lọc các giao dịch trong khoảng thời gian của dateRange
         const filteredTransactions: ITransaction[] = transactions.filter((transaction: ITransaction) => {
             const {day, month, year} = getDateComponents(transaction.date);
             const transactionDate = new Date(year, month - 1, day);
             return transactionDate >= startDate && transactionDate <= endDate;
         });
 
-        // Tính tổng thu nhập và chi tiêu
+        console.log('filteredTransactions:', filteredTransactions);
+
         const income = filteredTransactions
             .filter((t) => t.type === 'income')
             .reduce((sum, t) => sum + t.amount, 0);
@@ -118,7 +108,6 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
         setTotalIncome(income);
         setTotalExpense(expense);
 
-        // Tính tổng theo category
         const categoryMap: { [key: string]: number } = {};
 
         filteredTransactions.forEach((transaction: ITransaction) => {
@@ -130,10 +119,8 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
             }
         });
 
-        // Tính tổng để tính phần trăm
         const total = Object.values(categoryMap).reduce((sum, amount) => sum + amount, 0);
 
-        // Chuyển categoryMap thành mảng để hiển thị
         const categoryArray = Object.keys(categoryMap).map((category) => ({
             category,
             amount: categoryMap[category],
@@ -142,13 +129,11 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
 
         setCategoryData(categoryArray);
 
-        // Tạo gradient màu
         const colors =
             selectedType === 'Chi tiêu'
                 ? generateGradientColors('#5E3FBE', '#FFFFFF', categoryArray.length || 1)
                 : generateGradientColors('#174E1F', '#3FBE52', categoryArray.length || 1);
 
-        // Tạo dữ liệu cho VictoryPie
         const pieData = categoryArray.map((item, index) => ({
             x: item.category,
             y: item.amount,
@@ -156,38 +141,34 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
             percentage: item.percentage,
         }));
 
+        console.log('chartData:', pieData);
         setChartData(pieData);
-    }, [selectedType, transactions, loading, dateRange]); // Thêm dateRange vào dependencies
+    }, [selectedType, transactions, loading, dateRange]);
 
-    // Lấy chiều rộng màn hình để biểu đồ responsive
     const screenWidth = Dimensions.get('window').width;
 
-    // Hàm xử lý khi nhấn nút điều hướng thời gian (trái/phải)
     const handleDateNavigation = (direction: 'prev' | 'next') => {
         let newMonth = currentMonth;
         let newYear = currentYear;
 
         if (selectedPeriod === 'Tháng') {
-            // Điều hướng theo tháng
             if (direction === 'prev') {
                 newMonth -= 1;
                 if (newMonth < 0) {
-                    newMonth = 11; // Quay lại tháng 12 của năm trước
+                    newMonth = 11;
                     newYear -= 1;
                 }
             } else {
                 newMonth += 1;
                 if (newMonth > 11) {
-                    newMonth = 0; // Sang tháng 1 của năm sau
+                    newMonth = 0;
                     newYear += 1;
                 }
             }
 
-            // Cập nhật tháng/năm
             setCurrentMonth(newMonth);
             setCurrentYear(newYear);
 
-            // Tính ngày đầu và cuối của tháng mới
             const startOfNewMonth = new Date(newYear, newMonth, 1);
             const endOfNewMonth = new Date(newYear, newMonth + 1, 0);
             setDateRange({
@@ -195,18 +176,16 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
                 end: formatDate(endOfNewMonth),
             });
         } else if (selectedPeriod === 'Tuần') {
-            // Điều hướng theo tuần
             const currentStartDate = new Date(currentYear, currentMonth, parseInt(dateRange.start.split('/')[0]));
             if (direction === 'prev') {
-                currentStartDate.setDate(currentStartDate.getDate() - 7); // Giảm 7 ngày
+                currentStartDate.setDate(currentStartDate.getDate() - 7);
             } else {
-                currentStartDate.setDate(currentStartDate.getDate() + 7); // Tăng 7 ngày
+                currentStartDate.setDate(currentStartDate.getDate() + 7);
             }
 
             const endOfWeek = new Date(currentStartDate);
-            endOfWeek.setDate(currentStartDate.getDate() + 6); // Cuối tuần (6 ngày sau ngày đầu)
+            endOfWeek.setDate(currentStartDate.getDate() + 6);
 
-            // Cập nhật tháng/năm dựa trên ngày đầu tuần
             setCurrentMonth(currentStartDate.getMonth());
             setCurrentYear(currentStartDate.getFullYear());
 
@@ -215,19 +194,16 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
                 end: formatDate(endOfWeek),
             });
         } else if (selectedPeriod === 'Năm') {
-            // Điều hướng theo năm
             if (direction === 'prev') {
                 newYear -= 1;
             } else {
                 newYear += 1;
             }
 
-            // Cập nhật năm
             setCurrentYear(newYear);
 
-            // Tính ngày đầu và cuối của năm mới
-            const startOfYear = new Date(newYear, 0, 1); // 01/01
-            const endOfYear = new Date(newYear, 11, 31); // 31/12
+            const startOfYear = new Date(newYear, 0, 1);
+            const endOfYear = new Date(newYear, 11, 31);
             setDateRange({
                 start: formatDate(startOfYear),
                 end: formatDate(endOfYear),
@@ -235,7 +211,6 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
         }
     };
 
-    // Hàm render từng category trong danh sách
     const renderCategoryItem = ({item}: { item: { category: string; amount: number; percentage: number } }) => (
         <View style={styles.transactionItem}>
             <Text style={styles.transactionDescription}>{item.category}</Text>
@@ -252,7 +227,6 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
 
     return (
         <View style={styles.container}>
-            {/* Tiêu đề và nút quay lại */}
             <View style={styles.headerContainer}>
                 <Text style={styles.header}>Chi tiêu</Text>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
@@ -260,7 +234,6 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
                 </TouchableOpacity>
             </View>
 
-            {/* Thanh điều hướng thời gian */}
             <View style={styles.tabWrapper}>
                 <View style={styles.tabContainer}>
                     <TouchableOpacity
@@ -284,9 +257,7 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
                 </View>
             </View>
 
-            {/* Biểu đồ và các thành phần liên quan */}
             <View style={styles.chartContainer}>
-                {/* Khoảng thời gian và nút điều hướng */}
                 <View style={styles.dateContainer}>
                     <TouchableOpacity onPress={() => handleDateNavigation('prev')}>
                         <Ionicons name="chevron-back" size={24} color="#007AFF"/>
@@ -297,119 +268,103 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
                     </TouchableOpacity>
                 </View>
 
-                {/* Biểu đồ */}
                 <View style={styles.chartWrapper}>
                     {loading ? (
                         <Text style={{textAlign: 'center', color: '#666'}}>Đang tải dữ liệu...</Text>
                     ) : chartData.length > 0 ? (
                         <View>
                             {chartType === 'pie' ? (
-                                <VictoryPie
-                                    data={chartData}
-                                    colorScale={chartData.map((item) => item.color)}
-                                    labels={({datum}) => [
-                                        datum.x,
-                                        `${datum.percentage.toFixed(1)}%`,
-                                        VNDFormat(datum.y),
-                                    ]}
-                                    cornerRadius={15}
-                                    labelIndicator={
-                                        <LineSegment
-                                            style={{
-                                                stroke: 'black',
-                                                strokeDasharray: 1,
-                                                fill: 'none',
-                                            }}
-                                        />
-                                    }
-                                    padAngle={() => 1}
-                                    labelIndicatorInnerOffset={50}
-                                    labelIndicatorOuterOffset={1}
-                                    labelComponent={
-                                        <VictoryTooltip
-                                            cornerRadius={10}
-                                            flyoutStyle={{
-                                                fill: '#3e848f',
-                                                fillOpacity: 0.5,
-                                                stroke: 'none',
-                                            }}
-                                            style={{
-                                                fontSize: 13,
-                                                fill: '#FFFFFF',
-                                                fontWeight: 'bold',
-                                            }}
-                                            flyoutPadding={10}
-                                        />
-                                    }
-                                />
-                            ) : (
-                                <VictoryChart
-                                    domainPadding={{x: 50}}
-                                    padding={{left: 100, top: 50, right: 50, bottom: 75}}
-                                    width={screenWidth - 200}
-                                    height={300}
+                                <Box
+                                    width={300}
+                                    height={500}
+                                    $dark-bg="$black"
+                                    $light-bg="$white"
+                                    paddingHorizontal={5}
+                                    paddingVertical={10}
                                 >
-                                    <VictoryAxis
-                                        tickFormat={(t) => t}
-                                        style={{
-                                            axis: {stroke: '#FFFFFF'},
-                                            tickLabels: {
-                                                fontSize: 12,
-                                                fill: '#FFFFFF',
-                                                angle: 45,
-                                                textAnchor: 'start',
-                                            },
-                                            grid: {stroke: 'none'},
-                                        }}
-                                    />
-                                    <VictoryAxis
-                                        dependentAxis
-                                        tickFormat={(t: number) => VNDKFormat(t)}
-                                        style={{
-                                            axis: {stroke: '#FFFFFF'},
-                                            tickLabels: {
-                                                fontSize: 12,
-                                                fill: '#FFFFFF',
-                                            },
-                                            grid: {stroke: '#FFFFFF', strokeDasharray: '2,2'},
-                                        }}
-                                    />
-                                    <VictoryBar
-                                        data={chartData}
-                                        x="x"
-                                        y="y"
-                                        barWidth={50}
-                                        cornerRadius={{top: 5}}
-                                        style={{
-                                            data: {
-                                                fill: ({datum}) => datum.color,
-                                            },
-                                            labels: {
-                                                fontSize: 13,
-                                                fill: '#FFFFFF',
-                                                fontWeight: 'bold',
-                                            },
-                                        }}
-                                        labels={({datum}) => [VNDFormat(datum.y)]}
-                                        labelComponent={
-                                            <VictoryTooltip
-                                                cornerRadius={10}
-                                                flyoutStyle={{
-                                                    fill: '#3e848f',
-                                                    fillOpacity: 0.5,
-                                                    stroke: 'none',
+                                    <Box width="100%" $dark-bg="$black" $light-bg="$white" height="80%">
+                                        <PolarChart
+                                            data={chartData}
+                                            colorKey="color"
+                                            valueKey="y"
+                                            labelKey="x"
+                                        >
+                                            <Pie.Chart>
+                                                {() => {
+                                                    return (
+                                                        <>
+                                                            <Pie.Slice/>
+                                                        </>
+                                                    );
                                                 }}
-                                                style={{
-                                                    fontSize: 13,
-                                                    fill: '#FFFFFF',
-                                                    fontWeight: 'bold',
-                                                }}
-                                                flyoutPadding={10}
-                                                dy={({index}) => (index === 0 ? -10 : 20)}
-                                            />
-                                        }
-                                    />
-                                </VictoryChart>
+                                            </Pie.Chart>
+                                        </PolarChart>
+                                    </Box>
+                                    <Box width="100%" $dark-bg="$black" $light-bg="$white" height="20%">
+                                        {chartData.map((val, index) => (
+                                            <HStack
+                                                key={index}
+                                                alignItems="center"
+                                                justifyContent="center"
+                                                gap={10}
+                                            >
+                                                <View
+                                                    style={{height: 10, width: 10, backgroundColor: val.color}}
+                                                />
+                                                <Text style={{width: 80}}>{val.x}</Text>
+                                            </HStack>
+                                        ))}
+                                    </Box>
+                                </Box>
+                            ) : (
+                                <Box
+                                    width={350}
+                                    height={300}
+                                    $dark-bg="$black"
+                                    $light-bg="$white"
+                                    paddingHorizontal={5}
+                                    paddingVertical={10}
+                                >
+                                    <Box width="100%" $dark-bg="$black" $light-bg="$white" height="100%">
+                                        <CartesianChart
+                                            data={chartData}
+                                            xKey="x"
+                                            yKeys={["y"]}
+                                            domain={{y: [0, Math.max(...chartData.map(item => item.y))]}}
+                                            domainPadding={{left: 50, right: 50, top: 30}}
+                                            axisOptions={{
+                                                font,
+                                                tickCount: {x: chartData.length, y: 5},
+                                                lineColor: '#FFFFFF',
+                                                labelColor: '#FFFFFF',
+                                                formatYLabel: (value) => VNDKFormat(value),
+                                                labelOffset: {x: 10, y: 5},
+                                            }}
+                                        >
+                                            {({points, chartBounds}) => {
+                                                return points.y.map((point, index) => (
+                                                    <Bar
+                                                        key={index}
+                                                        barWidth={50}
+                                                        points={[point]}
+                                                        chartBounds={chartBounds}
+                                                        animate={{type: "timing", duration: 1000}}
+                                                        roundedCorners={{
+                                                            topLeft: 5,
+                                                            topRight: 5,
+                                                        }}
+                                                    >
+                                                        <LinearGradient
+                                                            start={vec(0, 0)}
+                                                            end={vec(0, chartBounds.bottom)}
+                                                            colors={[chartData[index].color, `${chartData[index].color}50`]}
+                                                        />
+                                                    </Bar>
+                                                ));
+                                            }}
+                                        </CartesianChart>
+                                    </Box>
+                                </Box>
                             )}
                         </View>
                     ) : (
@@ -417,7 +372,6 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
                     )}
                 </View>
 
-                {/* Nút chuyển đổi biểu đồ */}
                 <View style={styles.chartToggleWrapper}>
                     <View style={styles.chartToggleContainer}>
                         <TouchableOpacity
@@ -436,7 +390,6 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
                 </View>
             </View>
 
-            {/* Thông tin chi tiêu và thu nhập */}
             <View style={styles.summaryWrapper}>
                 <View style={styles.summaryContainer}>
                     <TouchableOpacity
@@ -464,7 +417,6 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
                 </View>
             </View>
 
-            {/* Danh sách category */}
             <FlatList
                 data={categoryData}
                 renderItem={renderCategoryItem}
