@@ -1,0 +1,31 @@
+﻿.date-picker-popper {
+    z-index: 9999 !important; /* Đảm bảo popup có z-index cao */
+}
+
+.react-datepicker-wrapper {
+    display: inline-block;
+    width: 100%;
+}
+
+.react-datepicker__input-container {
+    width: 100%;
+}
+
+.react-datepicker {
+    font-size: 14px;
+}
+
+.react-datepicker__day-name,
+.react-datepicker__day,
+.react-datepicker__time-name {
+    width: 2rem;
+    line-height: 2rem;
+    text-align: center;
+    margin: 0.166rem;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+    background-color: #007AFF;
+    color: white;
+}

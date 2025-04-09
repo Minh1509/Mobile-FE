@@ -12,6 +12,9 @@ export type RootStackParamList = {
     year: number;
   };
   IncomeAndExpenditureChart: undefined;
+  CategoryAnalysisChart: undefined;
+  TrendChart: undefined;
+  IncomeAndExpenditureComparisonChart: undefined;
   AddExpense: undefined;
   AddIncome: undefined;
   AddBudget: undefined;
