@@ -10,7 +10,7 @@ import {
   Image,
   Modal,
   ActivityIndicator,
-  Platform
+  Platform,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
@@ -19,11 +19,14 @@ import { auth } from "@/firebase_config.env";
 import { signOut } from "firebase/auth";
 import { RootStackParamList } from "@/app/Types/types";
 import { ReportService } from "@/app/services/report.service";
-import * as FileSystem from 'expo-file-system';
-import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
 import { useUserAuth } from "@/app/hooks/userAuth";
 
-type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, "Profile">;
+type ProfileScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "Profile"
+>;
 
 const ProfileScreen: React.FC = () => {
   const { displayName, email } = useUserAuth();
@@ -31,16 +34,18 @@ const ProfileScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
-  const [filePath, setFilePath] = useState(FileSystem.documentDirectory + "Download/reports.csv");
+  const [filePath, setFilePath] = useState(
+    FileSystem.documentDirectory + "Download/reports.csv"
+  );
   const [hasPermission, setHasPermission] = useState(false);
   const [isReportGenerating, setIsReportGenerating] = useState(false);
 
   useEffect(() => {
     const requestPermission = async () => {
-      if (Platform.OS === 'android') {
+      if (Platform.OS === "android") {
         const { status } = await MediaLibrary.requestPermissionsAsync();
-        setHasPermission(status === 'granted');
-        if (status !== 'granted') {
+        setHasPermission(status === "granted");
+        if (status !== "granted") {
           Alert.alert(
             "Cần quyền truy cập",
             "Ứng dụng cần quyền truy cập bộ nhớ để lưu file CSV vào thư mục Downloads.",
@@ -71,10 +76,10 @@ const ProfileScreen: React.FC = () => {
       setIsExporting(true);
       setIsDialogVisible(false);
 
-      if (Platform.OS === 'android' && !hasPermission) {
+      if (Platform.OS === "android" && !hasPermission) {
         const { status } = await MediaLibrary.requestPermissionsAsync();
-        setHasPermission(status === 'granted');
-        if (status !== 'granted') {
+        setHasPermission(status === "granted");
+        if (status !== "granted") {
           Alert.alert(
             "Quyền truy cập bị từ chối",
             "Không thể lưu file vào thư mục Downloads. Vui lòng cấp quyền trong cài đặt ứng dụng.",
@@ -96,10 +101,10 @@ const ProfileScreen: React.FC = () => {
 
       // Sử dụng UTF-8 encoding cho nội dung tiếng Việt
       await FileSystem.writeAsStringAsync(tempFilePath, csvWithBOM, {
-        encoding: FileSystem.EncodingType.UTF8
+        encoding: FileSystem.EncodingType.UTF8,
       });
 
-      if (Platform.OS === 'android') {
+      if (Platform.OS === "android") {
         // Lưu file vào thư mục Downloads
         const asset = await MediaLibrary.createAssetAsync(tempFilePath);
         await MediaLibrary.createAlbumAsync("Downloads", asset, false);
@@ -109,18 +114,24 @@ const ProfileScreen: React.FC = () => {
           "Báo cáo CSV đã được lưu thành công vào thư mục Downloads!",
           [
             {
-              text: "OK"
-            }
+              text: "OK",
+            },
           ]
         );
       } else {
         const downloadDir = FileSystem.documentDirectory + "Download/";
-        await FileSystem.makeDirectoryAsync(downloadDir, { intermediates: true });
-        await FileSystem.moveAsync({ from: tempFilePath, to: downloadDir + "reports.csv" });
+        await FileSystem.makeDirectoryAsync(downloadDir, {
+          intermediates: true,
+        });
+        await FileSystem.moveAsync({
+          from: tempFilePath,
+          to: downloadDir + "reports.csv",
+        });
         Alert.alert("Thành công", "Báo cáo CSV đã được lưu thành công!");
       }
     } catch (error) {
-      const errorMessage = (error instanceof Error) ? error.message : 'Không xác định';
+      const errorMessage =
+        error instanceof Error ? error.message : "Không xác định";
       Alert.alert("Lỗi", `Đã xảy ra lỗi khi xuất CSV: ${errorMessage}`);
     } finally {
       setIsExporting(false);
@@ -132,7 +143,10 @@ const ProfileScreen: React.FC = () => {
       setIsReportGenerating(true); // Bật trạng thái khi tạo báo cáo
       const report = await ReportService.generateReport();
       if (report) {
-        Alert.alert("Thành công", `Đã tạo báo cáo cho tháng ${report.month}/${report.year} thành công!`);
+        Alert.alert(
+          "Thành công",
+          `Đã tạo báo cáo cho tháng ${report.month}/${report.year} thành công!`
+        );
       } else {
         Alert.alert("Lỗi", "Không thể tạo báo cáo. Vui lòng thử lại.");
       }
@@ -146,7 +160,10 @@ const ProfileScreen: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.profileCard}>
-        <Image source={{ uri: "https://i.pravatar.cc/150?img=3" }} style={styles.avatar} />
+        <Image
+          source={{ uri: "https://i.pravatar.cc/150?img=3" }}
+          style={styles.avatar}
+        />
         <Text style={styles.username}>{displayName}</Text>
       </View>
 
@@ -190,23 +207,38 @@ const ProfileScreen: React.FC = () => {
         )}
       </TouchableOpacity>
 
-      <Modal animationType="fade" transparent={true} visible={isDialogVisible} onRequestClose={() => setIsDialogVisible(false)} >
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isDialogVisible}
+        onRequestClose={() => setIsDialogVisible(false)}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Xác nhận xuất CSV</Text>
             <View style={styles.modalBody}>
               <Text>File sẽ được lưu vào thư mục Downloads với tên:</Text>
               <Text style={styles.fileNameText}>reports.csv</Text>
-              {Platform.OS === 'android' && !hasPermission && (
-                <Text style={styles.warningText}>Ứng dụng cần quyền truy cập bộ nhớ để lưu file.</Text>
+              {Platform.OS === "android" && !hasPermission && (
+                <Text style={styles.warningText}>
+                  Ứng dụng cần quyền truy cập bộ nhớ để lưu file.
+                </Text>
               )}
             </View>
             <View style={styles.modalActions}>
-              <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={() => setIsDialogVisible(false)}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setIsDialogVisible(false)}
+              >
                 <Text style={styles.modalButtonText}>Hủy</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalButton, styles.confirmButton]} onPress={handleExportCSV}>
-                <Text style={[styles.modalButtonText, { color: '#fff' }]}>Xác nhận</Text>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.confirmButton]}
+                onPress={handleExportCSV}
+              >
+                <Text style={[styles.modalButtonText, { color: "#fff" }]}>
+                  Xác nhận
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -222,14 +254,25 @@ const TouchableSettingItem: React.FC<{
   onPress: () => void;
   isLoading?: boolean;
 }> = ({ icon, title, onPress, isLoading = false }) => (
-  <TouchableOpacity style={styles.settingItem} onPress={onPress} disabled={isLoading}>
+  <TouchableOpacity
+    style={styles.settingItem}
+    onPress={onPress}
+    disabled={isLoading}
+  >
     <Icon name={icon} size={20} style={styles.icon} />
     <Text style={styles.settingText}>{title}</Text>
-    {isLoading ? <ActivityIndicator size="small" color="#999" /> : <Icon name="chevron-right" size={14} style={styles.iconRight} />}
+    {isLoading ? (
+      <ActivityIndicator size="small" color="#999" />
+    ) : (
+      <Icon name="chevron-right" size={14} style={styles.iconRight} />
+    )}
   </TouchableOpacity>
 );
 
-const SettingItem: React.FC<{ icon: string; title: string }> = ({ icon, title }) => (
+const SettingItem: React.FC<{ icon: string; title: string }> = ({
+  icon,
+  title,
+}) => (
   <TouchableOpacity style={styles.settingItem}>
     <Icon name={icon} size={20} style={styles.icon} />
     <Text style={styles.settingText}>{title}</Text>
@@ -240,70 +283,80 @@ const SettingItem: React.FC<{ icon: string; title: string }> = ({ icon, title })
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f7f7f7",
-    padding: 15,
+    backgroundColor: "#f9fafb",
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
   profileCard: {
     alignItems: "center",
-    marginBottom: 30,
-    backgroundColor: "#fff",
+    marginBottom: 20,
+    backgroundColor: "#ffffff",
     paddingVertical: 20,
-    borderRadius: 10,
-    elevation: 5,
-    shadowColor: "rgba(0, 0, 0, 0.1)",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    borderRadius: 16,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     marginBottom: 10,
+    borderWidth: 2,
+    borderColor: "#cbd5e0",
   },
   username: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1a202c",
   },
   settingSection: {
-    marginBottom: 30,
+    marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontWeight: "700",
     marginBottom: 10,
-    color: "#444",
+    color: "#2d3748",
   },
   settingItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    justifyContent: "space-between",
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    marginBottom: 10,
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 2,
   },
   icon: {
-    marginRight: 10,
-    color: "#4b4b4b",
+    marginRight: 12,
+    color: "#FF6347",
   },
   settingText: {
-    fontSize: 16,
+    fontSize: 15,
     flex: 1,
-    color: "#4b4b4b",
+    color: "#2d3748",
   },
   iconRight: {
-    color: "#4b4b4b",
+    color: "#a0aec0",
   },
   logoutButton: {
-    backgroundColor: "#FF5C5C",
-    paddingVertical: 12,
-    borderRadius: 5,
+    backgroundColor: "#e53e3e",
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: "center",
-    marginTop: 5,
+    marginBottom: 20,
+    elevation: 3,
   },
   disabledButton: {
-    backgroundColor: "#ddd",
+    backgroundColor: "#a0aec0",
   },
   buttonContent: {
     flexDirection: "row",
@@ -311,65 +364,65 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontSize: 16,
-    marginLeft: 10,
+    fontSize: 15,
+    fontWeight: "700",
+    marginLeft: 8,
   },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
   },
   modalContent: {
-    width: 300,
-    backgroundColor: "#fff",
+    width: "85%",
+    backgroundColor: "#ffffff",
     padding: 20,
-    borderRadius: 10,
-    elevation: 10,
-    shadowColor: "rgba(0, 0, 0, 0.2)",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    borderRadius: 14,
+    elevation: 6,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 12,
     textAlign: "center",
+    color: "#2d3748",
   },
   modalBody: {
-    marginBottom: 20,
+    marginBottom: 18,
     alignItems: "center",
   },
   fileNameText: {
     fontWeight: "bold",
-    color: "#333",
+    color: "#3182ce",
+    marginTop: 6,
   },
   warningText: {
-    color: "red",
-    fontSize: 14,
-    marginTop: 5,
+    color: "#e53e3e",
+    fontSize: 13,
+    marginTop: 10,
+    textAlign: "center",
   },
   modalActions: {
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 10,
   },
   modalButton: {
     flex: 1,
     paddingVertical: 10,
+    borderRadius: 10,
     alignItems: "center",
-    borderRadius: 5,
-    marginHorizontal: 5,
   },
   cancelButton: {
-    backgroundColor: "#ccc",
+    backgroundColor: "#edf2f7",
   },
   confirmButton: {
-    backgroundColor: "#28a745",
+    backgroundColor: "#3182ce",
   },
   modalButtonText: {
-    fontSize: 16,
-    color: "#444",
+    fontSize: 15,
+    fontWeight: "600",
   },
 });
 
