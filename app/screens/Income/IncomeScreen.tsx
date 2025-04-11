@@ -348,13 +348,13 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         marginBottom: 20,
-        backgroundColor: "#FF6347", // Header xanh lá
+        backgroundColor: "#34d399", // Header xanh lá
         paddingVertical: 12, // Giảm padding dọc
         paddingHorizontal: 16,
         borderRadius: 12,
     },
     headerText: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: "700",
         color: "#fff",
         flex: 1, // Cho phép co giãn
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     saveText: {
-        color: '#FF6347',
+        color: '#34d399',
         fontSize: 14,
         fontWeight: "600",
     },
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     currencyText: {
         fontSize: 20,
         fontWeight: '500',
-        color: '#FF6347',
+        color: '#34d399',
     },
     detailsCard: {
         backgroundColor: '#fff',
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#FF6347', // Xanh lá cho loading
+        backgroundColor: '#34d399', // Xanh lá cho loading
     },
     loadingText: {
         color: '#fff',
