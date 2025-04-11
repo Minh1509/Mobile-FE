@@ -349,14 +349,14 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        backgroundColor: "#4CAF50",
+        backgroundColor: "#34d399",
         paddingVertical: 12,
         paddingHorizontal: 16,
         borderRadius: 12,
         marginBottom: 20,
     },
     headerText: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: "700",
         color: "#fff",
         flex: 1,
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     saveText: {
-        color: '#4CAF50',
+        color: '#34d399',
         fontSize: 14,
         fontWeight: "600",
     },
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     currencyText: {
         fontSize: 20,
         fontWeight: '500',
-        color: '#4CAF50',
+        color: '#34d399',
     },
     detailsCard: {
         backgroundColor: '#fff',
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#34d399',
     },
     loadingText: {
         color: '#fff',
