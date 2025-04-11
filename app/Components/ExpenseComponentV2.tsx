@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#4CAF50", // Màu xanh lá đơn giản thay gradient
+    backgroundColor: "#FF6347", // Màu xanh lá đơn giản thay gradient
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 12,

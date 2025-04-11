@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        backgroundColor: "#4CAF50",
+        backgroundColor: "#FF6347",
         paddingVertical: 12,
         paddingHorizontal: 16,
         borderRadius: 12,
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     saveText: {
-        color: '#4CAF50',
+        color: '#FF6347',
         fontSize: 14,
         fontWeight: "600",
     },
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     currencyText: {
         fontSize: 20,
         fontWeight: '500',
-        color: '#4CAF50',
+        color: '#FF6347',
     },
     detailsCard: {
         backgroundColor: '#fff',
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#FF6347',
     },
     loadingText: {
         color: '#fff',

@@ -37,6 +37,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "21a7e607-e57d-49cd-b8bb-0c3fe4225d1c"
+      }
+    },
+    "owner": "minhhieu2003"
   }
 }

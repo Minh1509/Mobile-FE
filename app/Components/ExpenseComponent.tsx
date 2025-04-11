@@ -16,7 +16,7 @@ const ExpenseComponent: React.FC<ExpenseComponentProps> = ({ icon, text, onPress
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <MaterialCommunityIcons name={icon} size={26} color="#4CAF50" style={styles.icon} />
+      <MaterialCommunityIcons name={icon} size={26} color="#FF6347" style={styles.icon} />
       <Text style={styles.text}>{text}</Text>
       <MaterialCommunityIcons
         name="chevron-right"
