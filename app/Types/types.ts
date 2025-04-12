@@ -10,6 +10,7 @@ export type RootStackParamList = {
   CategoryTransactions: {
     category: string, month: number;
     year: number;
+    selectedDate?: any
   };
   IncomeAndExpenditureChart: undefined;
   CategoryAnalysisChart: undefined;
