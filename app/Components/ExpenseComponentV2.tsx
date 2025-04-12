@@ -9,14 +9,24 @@ type ExpenseComponentV2Props = {
   style?: object;
 };
 
-const ExpenseComponentV2: React.FC<ExpenseComponentV2Props> = ({ icon, text, onPress, style }) => {
+const ExpenseComponentV2: React.FC<ExpenseComponentV2Props> = ({
+  icon,
+  text,
+  onPress,
+  style,
+}) => {
   return (
     <TouchableOpacity
       style={[styles.container, style]}
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <MaterialCommunityIcons name={icon} size={24} color="#fff" style={styles.icon} />
+      <MaterialCommunityIcons
+        name={icon}
+        size={24}
+        color="#fff"
+        style={styles.icon}
+      />
       <Text style={styles.text}>{text}</Text>
     </TouchableOpacity>
   );
