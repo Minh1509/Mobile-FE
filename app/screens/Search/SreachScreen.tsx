@@ -25,7 +25,7 @@ const SearchScreen = () => {
 
   const handleSearch = useCallback((query: string) => setSearchQuery(query), []);
   const handleTransactionPress = useCallback((transaction: ITransaction) => {
-    navigation.navigate('TransactionDetail', { transaction });
+    navigation.navigate('TransactionDetail', { transaction, origin: 'Search' });
   }, [navigation]);
 
   const resetFilters = useCallback(() => {

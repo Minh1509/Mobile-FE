@@ -4,7 +4,6 @@ import { Ionicons } from "@expo/vector-icons";
 import HomeScreen from "../screens/Home/HomeScreen";
 import CalendarScreen from "../screens/Calendar/CalendarScreen";
 import ProfileScreen from "../screens/Profile/ProfileScreen";
-import AnalyticScreen from "../screens/Analytic/AnalyticScreen";
 import { useNavigation, StackActions } from "@react-navigation/native";
 import ExpenseScreen from "../screens/Expense/ExpenseScreen";
 import IncomeScreen from "../screens/Income/IncomeScreen";

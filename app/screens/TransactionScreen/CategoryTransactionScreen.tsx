@@ -18,11 +18,12 @@ import TransactionItem from "@/app/Components/TransactionItem";
 const CategoryTransactionsScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute();
-  const { category, month, year, selectedDate } = route.params as {
+  const { category, month, year, selectedDate, origin } = route.params as {
     category: string;
     month: number;
     year: number;
     selectedDate?: any;
+    origin?: 'Calendar' | 'Home';
   };
 
   // Lấy toàn bộ giao dịch từ hook
@@ -69,7 +70,7 @@ const CategoryTransactionsScreen = () => {
   }, [total]);
 
   const handleTransactionPress = (transaction: ITransaction) => {
-    navigation.navigate("TransactionDetail", { transaction });
+    navigation.navigate("TransactionDetail", { transaction, origin: origin || 'Home' });
   };
 
   return (

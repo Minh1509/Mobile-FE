@@ -32,7 +32,7 @@ type EditTransactionScreenRouteProp = RouteProp<RootStackParamList, 'EditTransac
 const EditTransactionScreen = () => {
     const navigation = useNavigation<EditTransactionScreenNavigationProp>();
     const route = useRoute<EditTransactionScreenRouteProp>();
-    const transaction = route.params?.transaction;
+    const { transaction, origin } = route.params;
 
     const paymentMethods = ["cash", "card", "bank_transfer"];
     // Form state
@@ -178,25 +178,58 @@ const EditTransactionScreen = () => {
               {
                 text: "OK",
                 onPress: () => {
-                  console.log('Resetting stack to Tabs -> CategoryTransactions -> TransactionDetail');
-                  navigation.reset({
-                    index: 2, // Chỉ định TransactionDetail là màn hình hiện tại
-                    routes: [
-                      { name: 'Tabs' }, // Thêm Tabs vào stack
-                      {
-                        name: 'CategoryTransactions',
-                        params: {
-                          category: fullTransaction.category,
-                          month: date.getMonth() + 1,
-                          year: date.getFullYear(),
-                        },
-                      },
-                      {
-                        name: 'TransactionDetail',
-                        params: { transaction: fullTransaction },
-                      },
-                    ],
-                  });
+                    if (origin === 'Search') {
+                        navigation.reset({
+                          index: 1,
+                          routes: [
+                            { name: 'Tabs', state: {routes: [{ name: 'Search'}]}},
+                            {
+                              name: 'TransactionDetail',
+                              params: { transaction: fullTransaction, origin: 'Search' },
+                            },
+                          ],
+                        });
+                      } else if (origin === 'Calendar') {
+                        navigation.reset({
+                          index: 2,
+                          routes: [
+                            { name: 'Tabs', state: { routes: [{ name: 'Calendar' }] } },
+                            {
+                              name: 'CategoryTransactions',
+                              params: {
+                                category: fullTransaction.category,
+                                month: date.getMonth() + 1,
+                                year: date.getFullYear(),
+                                selectedDate: fullTransaction.date.split('/').reverse().join('-'),
+                                origin: 'Calendar',
+                              },
+                            },
+                            {
+                              name: 'TransactionDetail',
+                              params: { transaction: fullTransaction, origin: 'Calendar' },
+                            },
+                          ],
+                        });
+                      } else {
+                        navigation.reset({
+                          index: 2,
+                          routes: [
+                            { name: 'Tabs' },
+                            {
+                              name: 'CategoryTransactions',
+                              params: {
+                                category: fullTransaction.category,
+                                month: date.getMonth() + 1,
+                                year: date.getFullYear(),
+                              },
+                            },
+                            {
+                              name: 'TransactionDetail',
+                              params: { transaction: fullTransaction, origin: 'Home' },
+                            },
+                          ],
+                        });
+                      }
                 },
               },
             ]);

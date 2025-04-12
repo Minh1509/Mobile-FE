@@ -38,7 +38,7 @@ const formatPaymentMethod = (method: PayMethod): string => {
 
 const TransactionDetailScreen = () => {
     const navigation = useNavigation<TransactionDetailNavigationProp>();
-    const { params: { transaction } } = useRoute<TransactionDetailRouteProp>();
+    const { params: { transaction, origin: paramsOrigin } } = useRoute<TransactionDetailRouteProp>();
     const { imageSource } = getCategoryIcon(transaction.category);
     const [imageError, setImageError] = useState(false); // Trạng thái lỗi tải ảnh
 
@@ -71,12 +71,17 @@ const TransactionDetailScreen = () => {
         ]);
     };
 
+    const origin = paramsOrigin || 'Home';
+
     return (
         <SafeAreaView className="flex-1 bg-gray-100">
             <Header
                 title="Chi tiết giao dịch"
                 onBack={navigation.goBack}
-                onEdit={() => navigation.navigate('EditTransaction', { transaction })}
+                onEdit={() => navigation.navigate('EditTransaction', { 
+                    transaction,
+                    origin
+                 })}
                 onDelete={handleDelete}
             />
 
