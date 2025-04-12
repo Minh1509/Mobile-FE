@@ -354,168 +354,168 @@ const IncomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  background: {
-    flex: 1,
-    backgroundColor: "#f0f4f8", // Màu nền xám nhạt thay gradient
-  },
-  scrollContainer: { padding: 20, paddingBottom: 40 },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 20,
-    backgroundColor: "#34d399", // Header xanh lá
-    paddingVertical: 12, // Giảm padding dọc
-    paddingHorizontal: 16,
-    borderRadius: 12,
-  },
-  headerText: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#fff",
-    flex: 1, // Cho phép co giãn
-    marginHorizontal: 12, // Khoảng cách hai bên
-    textAlign: "center", // Căn giữa
-  },
-  iconButton: {
-    padding: 8,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    borderRadius: 10,
-  },
-  saveButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    elevation: 3,
-  },
-  saveText: {
-    color: "#34d399",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  moneyInputContainer: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 20,
-    marginBottom: 20,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  moneyInput: {
-    flex: 1,
-    fontSize: 26,
-    fontWeight: "600",
-    color: "#333",
-  },
-  currencyText: {
-    fontSize: 20,
-    fontWeight: "500",
-    color: "#34d399",
-  },
-  detailsCard: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 20,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  inputField: {
-    backgroundColor: "#f8f9fa",
-    borderRadius: 12,
-    padding: 14,
-    fontSize: 16,
-    color: "#333",
-    marginVertical: 8,
-    elevation: 1,
-  },
-  imageContainer: {
-    marginTop: 12,
-  },
-  previewImage: {
-    width: "100%",
-    height: 200,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  imageButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  toggleButton: {
-    backgroundColor: "#2196F3", // Nút xanh dương
-    paddingVertical: 12,
-    borderRadius: 20,
-    alignItems: "center",
-    elevation: 3,
-  },
-  toggleButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 20,
-    width: "85%",
-    maxHeight: "70%",
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#333",
-    marginBottom: 16,
-  },
-  modalItem: {
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  modalItemText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  closeModalButton: {
-    marginTop: 16,
-    paddingVertical: 12,
-    backgroundColor: "#2196F3",
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  closeModalText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#34d399", // Xanh lá cho loading
-  },
-  loadingText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "500",
-  },
+    container: { flex: 1 },
+    background: {
+        flex: 1,
+        backgroundColor: "#f0f4f8", // Màu nền xám nhạt thay gradient
+    },
+    scrollContainer: { padding: 20, paddingBottom: 40 },
+    header: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: 20,
+        backgroundColor: "#34d399", // Header xanh lá
+        paddingVertical: 12, // Giảm padding dọc
+        paddingHorizontal: 16,
+        borderRadius: 12,
+    },
+    headerText: {
+        fontSize: 18,
+        fontWeight: "700",
+        color: "#fff",
+        flex: 1, // Cho phép co giãn
+        marginHorizontal: 12, // Khoảng cách hai bên
+        textAlign: "center", // Căn giữa
+    },
+    iconButton: {
+        padding: 8,
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        borderRadius: 10,
+    },
+    saveButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        elevation: 3,
+    },
+    saveText: {
+        color: '#34d399',
+        fontSize: 14,
+        fontWeight: "600",
+    },
+    moneyInputContainer: {
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 20,
+        marginBottom: 20,
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    moneyInput: {
+        flex: 1,
+        fontSize: 26,
+        fontWeight: '600',
+        color: '#333',
+    },
+    currencyText: {
+        fontSize: 20,
+        fontWeight: '500',
+        color: '#34d399',
+    },
+    detailsCard: {
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 20,
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    inputField: {
+        backgroundColor: '#f8f9fa',
+        borderRadius: 12,
+        padding: 14,
+        fontSize: 16,
+        color: '#333',
+        marginVertical: 8,
+        elevation: 1,
+    },
+    imageContainer: {
+        marginTop: 12,
+    },
+    previewImage: {
+        width: '100%',
+        height: 200,
+        borderRadius: 12,
+        marginBottom: 12,
+    },
+    imageButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    toggleButton: {
+        backgroundColor: '#2196F3', // Nút xanh dương
+        paddingVertical: 12,
+        borderRadius: 20,
+        alignItems: 'center',
+        elevation: 3,
+    },
+    toggleButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        padding: 20,
+        width: '85%',
+        maxHeight: '70%',
+        elevation: 5,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: '700',
+        color: '#333',
+        marginBottom: 16,
+    },
+    modalItem: {
+        paddingVertical: 14,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    modalItemText: {
+        fontSize: 16,
+        color: '#333',
+    },
+    closeModalButton: {
+        marginTop: 16,
+        paddingVertical: 12,
+        backgroundColor: '#2196F3',
+        borderRadius: 12,
+        alignItems: 'center',
+    },
+    closeModalText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#34d399', // Xanh lá cho loading
+    },
+    loadingText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: '500',
+    },
 });
 
 export default IncomeScreen;
