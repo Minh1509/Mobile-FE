@@ -142,10 +142,14 @@ const ProfileScreen: React.FC = () => {
     try {
       setIsReportGenerating(true); // Bật trạng thái khi tạo báo cáo
       const report = await ReportService.generateReport();
-      if (report) {
+
+      if (report && report.startDate) {
+        // Tách chuỗi startDate dạng "dd/mm/yyyy"
+        const [day, month, year] = report.startDate.split("/");
+
         Alert.alert(
           "Thành công",
-          `Đã tạo báo cáo cho tháng ${report.month}/${report.year} thành công!`
+          `Đã tạo báo cáo cho tháng ${month}/${year} thành công!`
         );
       } else {
         Alert.alert("Lỗi", "Không thể tạo báo cáo. Vui lòng thử lại.");
