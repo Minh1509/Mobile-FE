@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useState, useMemo } from "react";
 import CalendarComponent from "@/app/Components/CalendarComponent";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "@/app/Types/types";
 import { normalizeDate } from "@/app/utils/normalizeDate";
@@ -12,13 +12,14 @@ import { ITransaction, TransactionType } from "@/app/interface/Transaction";
 import { useTransactions } from "@/app/hooks/useTransactions";
 
 type CalendarScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type CalendarScreenRouteProp = RouteProp<RootStackParamList, 'Calendar'>;
 
 export default function CalendarScreen() {
   const navigation = useNavigation<CalendarScreenNavigationProp>();
+  const route = useRoute<CalendarScreenRouteProp>();
   const currentDate = new Date();
-  const [selectedDate, setSelectedDate] = useState(
-    currentDate.toISOString().split("T")[0]
-  );
+  const initialDate = route.params?.selectedDate || currentDate.toISOString().split("T")[0];
+  const [selectedDate, setSelectedDate] = useState(initialDate);
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [year, setYear] = useState(currentDate.getFullYear());
 

@@ -5,6 +5,7 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   Search: undefined;
+  Calendar: { selectedDate?: string };
   Utility: undefined; // Thêm Utility
   TransactionDetail: { transaction: ITransaction; origin?: 'Home' | 'Search' | 'Calendar'};
   EditTransaction: { transaction: ITransaction; origin?: 'Home' | 'Search' | 'Calendar' };

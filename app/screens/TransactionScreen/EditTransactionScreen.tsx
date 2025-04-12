@@ -193,7 +193,19 @@ const EditTransactionScreen = () => {
                         navigation.reset({
                           index: 2,
                           routes: [
-                            { name: 'Tabs', state: { routes: [{ name: 'Calendar' }] } },
+                            {
+                                name: 'Tabs',
+                                state: {
+                                  routes: [
+                                    {
+                                      name: 'Calendar',
+                                      params: {
+                                        selectedDate: fullTransaction.date.split('/').reverse().join('-'),
+                                      },
+                                    },
+                                  ],
+                                },
+                              },
                             {
                               name: 'CategoryTransactions',
                               params: {
