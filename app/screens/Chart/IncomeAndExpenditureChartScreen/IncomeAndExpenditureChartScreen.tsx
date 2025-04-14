@@ -1,5 +1,5 @@
 ﻿import React, {useEffect, useState} from 'react';
-import {TouchableOpacity, FlatList, Dimensions} from 'react-native';
+import {TouchableOpacity, FlatList, Dimensions, ScrollView} from 'react-native';
 import {Box, HStack, Text, View} from "@gluestack-ui/themed";
 import {Pie, PolarChart, CartesianChart, Bar} from "victory-native";
 import {useFont, vec, LinearGradient} from "@shopify/react-native-skia";
@@ -276,7 +276,7 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
                             {chartType === 'pie' ? (
                                 <Box
                                     width={300}
-                                    height={500}
+                                    height={450}
                                     $dark-bg="$black"
                                     $light-bg="$white"
                                     paddingHorizontal={5}
@@ -300,20 +300,40 @@ const IncomeAndExpenditureChartScreen: React.FC = () => {
                                             </Pie.Chart>
                                         </PolarChart>
                                     </Box>
-                                    <Box width="100%" $dark-bg="$black" $light-bg="$white" height="20%">
-                                        {chartData.map((val, index) => (
-                                            <HStack
-                                                key={index}
-                                                alignItems="center"
-                                                justifyContent="center"
-                                                gap={10}
-                                            >
-                                                <View
-                                                    style={{height: 10, width: 10, backgroundColor: val.color}}
-                                                />
-                                                <Text style={{width: 80}}>{val.x}</Text>
-                                            </HStack>
-                                        ))}
+                                    <Box width="100%" $dark-bg="$black" $light-bg="$white" height={100}>
+                                        <ScrollView
+                                            horizontal={true}
+                                            contentContainerStyle={{
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                                paddingTop: 15,
+                                                paddingHorizontal: 10,
+                                                paddingBottom: 15, // Thêm padding dưới để thanh cuộn không bị che
+                                                gap: 10,
+                                            }}
+                                            style={{
+                                                backgroundColor: '#164057', // Màu nền đã thêm trước đó
+                                                borderWidth: 1, // Độ dày viền
+                                                borderColor: '#FFFFFF', // Màu viền trắng
+                                                borderRadius: 10, // Bo góc
+                                            }}
+                                            scrollIndicatorInsets={{bottom: 100, left: 10, right: 10}}
+                                        >
+                                            {chartData.map((val, index) => (
+                                                <HStack
+                                                    key={index}
+                                                    alignItems="center"
+                                                    gap={10}
+                                                    padding={5}
+                                                >
+                                                    <View style={{height: 10, width: 10, backgroundColor: val.color}}/>
+                                                    <Text style={{color: '#FFFFFF'}}>{val.x}</Text>
+                                                    <Text style={{color: val.color, fontWeight: 'bold'}}>
+                                                        {val.percentage.toFixed(2)}%
+                                                    </Text>
+                                                </HStack>
+                                            ))}
+                                        </ScrollView>
                                     </Box>
                                 </Box>
                             ) : (
