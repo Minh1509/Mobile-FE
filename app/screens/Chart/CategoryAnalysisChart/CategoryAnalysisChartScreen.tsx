@@ -1,5 +1,5 @@
 ﻿import React, {useEffect, useState} from 'react';
-import {TouchableOpacity, FlatList, Image, Dimensions, useColorScheme} from 'react-native';
+import {TouchableOpacity, FlatList, Image, Dimensions, useColorScheme, ScrollView} from 'react-native';
 import {Box, HStack, Text, View} from "@gluestack-ui/themed";
 import {COLORMODES} from "@gluestack-style/react/lib/typescript/types";
 import {Pie, PolarChart, CartesianChart, Bar, useChartPressState} from "victory-native";
@@ -279,21 +279,36 @@ const CategoryAnalysisChartScreen: React.FC = () => {
                                         </PolarChart>
                                     </Box>
                                     <Box width="100%" $dark-bg="$black" $light-bg="$white" height="20%">
-                                        {chartData.map((val, index) => {
-                                            return (
+                                        <ScrollView
+                                            horizontal={true}
+                                            showsHorizontalScrollIndicator={true} // Hiển thị thanh cuộn ngang
+                                            scrollIndicatorInsets={{bottom: 5}} // Điều chỉnh vị trí thanh cuộn
+                                            style={{
+                                                backgroundColor: '#e5e0e8', // Màu nền giống ScrollView phía trên
+                                                borderWidth: 1, // Viền
+                                                borderColor: '#FFFFFF', // Màu viền trắng
+                                                borderRadius: 10, // Bo góc
+                                            }}
+                                            contentContainerStyle={{
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                                paddingHorizontal: 10, // Thêm padding hai bên
+                                                gap: 10, // Khoảng cách giữa các item
+                                            }}
+                                        >
+                                            {chartData.map((val, index) => (
                                                 <HStack
                                                     key={index}
                                                     alignItems="center"
-                                                    justifyContent="center"
                                                     gap={10}
+                                                    padding={5}
                                                 >
-                                                    <View
-                                                        style={{height: 10, width: 10, backgroundColor: val.color}}
-                                                    />
-                                                    <Text style={{width: 80}}>{val.x}</Text>
+                                                    <View style={{height: 10, width: 10, backgroundColor: val.color}}/>
+                                                    <Text style={{width: 80, color: '#000000'}}>{val.x}</Text>
+                                                    <Text style={{width: 80, color: val.color}}>{val.percentage.toFixed(2)}%</Text>
                                                 </HStack>
-                                            );
-                                        })}
+                                            ))}
+                                        </ScrollView>
                                     </Box>
                                 </Box>
                             ) : (
