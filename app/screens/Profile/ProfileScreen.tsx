@@ -33,12 +33,15 @@ const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
   const [isLoading, setIsLoading] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [filePath, setFilePath] = useState(
     FileSystem.documentDirectory + "Download/reports.csv"
   );
   const [hasPermission, setHasPermission] = useState(false);
   const [isReportGenerating, setIsReportGenerating] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState("01");
+  const [selectedYear, setSelectedYear] = useState("2025");
+  const [isMonthYearModalVisible, setIsMonthYearModalVisible] = useState(false);
+  const [isExportCsvModalVisible, setIsExportCsvModalVisible] = useState(false);
 
   useEffect(() => {
     const requestPermission = async () => {
@@ -69,12 +72,11 @@ const ProfileScreen: React.FC = () => {
     }
   };
 
-  const confirmExportCSV = () => setIsDialogVisible(true);
+  const confirmExportCSV = () => setIsExportCsvModalVisible(true);
 
   const handleExportCSV = async () => {
     try {
       setIsExporting(true);
-      setIsDialogVisible(false);
 
       if (Platform.OS === "android" && !hasPermission) {
         const { status } = await MediaLibrary.requestPermissionsAsync();
@@ -140,11 +142,18 @@ const ProfileScreen: React.FC = () => {
 
   const handleGenerateReport = async () => {
     try {
-      setIsReportGenerating(true); // Bật trạng thái khi tạo báo cáo
-      const report = await ReportService.generateReport();
+      setIsReportGenerating(true);
+
+      // Tính toán startDate và endDate từ selectedMonth và selectedYear
+      const startDate = new Date(`${selectedYear}-${selectedMonth}-01`);
+      const endDate = new Date(startDate);
+      endDate.setMonth(startDate.getMonth() + 1);
+      endDate.setDate(0); // Đặt ngày cuối cùng của tháng
+
+      const report = await ReportService.generateReport(startDate, endDate);
 
       if (report && report.startDate) {
-        // Tách chuỗi startDate dạng "dd/mm/yyyy"
+        // Tách chuỗi startDate từ báo cáo
         const [day, month, year] = report.startDate.split("/");
 
         Alert.alert(
@@ -157,7 +166,7 @@ const ProfileScreen: React.FC = () => {
     } catch (error) {
       Alert.alert("Lỗi", "Đã xảy ra lỗi khi tạo báo cáo. Vui lòng thử lại.");
     } finally {
-      setIsReportGenerating(false); // Tắt trạng thái khi xong
+      setIsReportGenerating(false);
     }
   };
 
@@ -173,12 +182,13 @@ const ProfileScreen: React.FC = () => {
 
       <View style={styles.settingSection}>
         <Text style={styles.sectionTitle}>Báo Cáo Tài Chính</Text>
-        <TouchableSettingItem
-          icon="bar-chart"
-          title="Tạo báo cáo tháng này"
-          onPress={handleGenerateReport}
-          isLoading={isReportGenerating} // Sử dụng isReportGenerating cho nút tạo báo cáo
-        />
+        <TouchableOpacity
+          style={styles.settingItem}
+          onPress={() => setIsMonthYearModalVisible(true)}
+        >
+          <Icon name="bar-chart" size={20} style={styles.icon} />
+          <Text style={styles.settingText}>Tạo báo cáo hàng tháng</Text>
+        </TouchableOpacity>
         <TouchableSettingItem
           icon="file-text-o"
           title="Xuất báo cáo CSV"
@@ -186,6 +196,56 @@ const ProfileScreen: React.FC = () => {
           isLoading={isExporting}
         />
       </View>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isMonthYearModalVisible}
+        onRequestClose={() => setIsMonthYearModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Chọn tháng và năm</Text>
+            <View style={styles.modalBody}>
+              <TextInput
+                style={styles.input}
+                placeholder="Tháng (01-12)"
+                keyboardType="numeric"
+                value={selectedMonth}
+                onChangeText={setSelectedMonth}
+                maxLength={2}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Năm"
+                keyboardType="numeric"
+                value={selectedYear}
+                onChangeText={setSelectedYear}
+                maxLength={4}
+              />
+            </View>
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setIsMonthYearModalVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Hủy</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.confirmButton]}
+                onPress={() => {
+                  setIsMonthYearModalVisible(false);
+                  handleGenerateReport();
+                }}
+              >
+                <Text style={[styles.modalButtonText, { color: "#fff" }]}>
+                  Xác nhận
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       <View style={styles.settingSection}>
         <Text style={styles.sectionTitle}>Cài Đặt</Text>
@@ -214,8 +274,8 @@ const ProfileScreen: React.FC = () => {
       <Modal
         animationType="fade"
         transparent={true}
-        visible={isDialogVisible}
-        onRequestClose={() => setIsDialogVisible(false)}
+        visible={isExportCsvModalVisible}
+        onRequestClose={() => setIsExportCsvModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -232,13 +292,16 @@ const ProfileScreen: React.FC = () => {
             <View style={styles.modalActions}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setIsDialogVisible(false)}
+                onPress={() => setIsExportCsvModalVisible(false)}
               >
                 <Text style={styles.modalButtonText}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, styles.confirmButton]}
-                onPress={handleExportCSV}
+                onPress={() => {
+                  setIsExportCsvModalVisible(false);
+                  handleExportCSV();
+                }}
               >
                 <Text style={[styles.modalButtonText, { color: "#fff" }]}>
                   Xác nhận
@@ -257,21 +320,21 @@ const TouchableSettingItem: React.FC<{
   title: string;
   onPress: () => void;
   isLoading?: boolean;
-}> = ({ icon, title, onPress, isLoading = false }) => (
-  <TouchableOpacity
-    style={styles.settingItem}
-    onPress={onPress}
-    disabled={isLoading}
-  >
-    <Icon name={icon} size={20} style={styles.icon} />
-    <Text style={styles.settingText}>{title}</Text>
-    {isLoading ? (
-      <ActivityIndicator size="small" color="#999" />
-    ) : (
-      <Icon name="chevron-right" size={14} style={styles.iconRight} />
-    )}
-  </TouchableOpacity>
-);
+}> = ({ icon, title, onPress, isLoading = false }) => {
+  return (
+    <TouchableOpacity
+      style={styles.settingItem}
+      onPress={onPress}
+      disabled={isLoading}
+    >
+      <Icon name={icon} size={20} style={styles.icon} />
+      <Text style={styles.settingText}>{title}</Text>
+      {isLoading && (
+        <ActivityIndicator size="small" style={{ marginLeft: 10 }} />
+      )}
+    </TouchableOpacity>
+  );
+};
 
 const SettingItem: React.FC<{ icon: string; title: string }> = ({
   icon,
@@ -285,6 +348,19 @@ const SettingItem: React.FC<{ icon: string; title: string }> = ({
 );
 
 const styles = StyleSheet.create({
+  modalBody: {
+    marginBottom: 18,
+    alignItems: "center",
+  },
+  input: {
+    width: "80%",
+    height: 40,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingLeft: 10,
+    marginBottom: 10,
+  },
   container: {
     flex: 1,
     backgroundColor: "#f9fafb",
@@ -392,10 +468,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#2d3748",
   },
-  modalBody: {
-    marginBottom: 18,
-    alignItems: "center",
-  },
+
   fileNameText: {
     fontWeight: "bold",
     color: "#3182ce",
