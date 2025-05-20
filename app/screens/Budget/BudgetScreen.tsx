@@ -16,8 +16,8 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ExpenseComponent from "@/app/Components/ExpenseComponent";
 import { RootStackParamList } from "@/app/Types/types";
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from "@react-navigation/stack";
+import { useNavigation } from "@react-navigation/native";
 import { formatDate } from "@/app/utils/normalizeDate";
 import { addBudget } from "@/app/services/budget.service";
 import { useUserAuth } from "@/app/hooks/userAuth";
@@ -38,7 +38,19 @@ const BudgetScreen = () => {
   const [showToDatePicker, setShowToDatePicker] = useState(false);
   const [expanded, setExpanded] = useState(true);
 
-  const categories = ["Tổng", "Tiền điện", "Thuê nhà", "Internet", "Di chuyển", "Giải trí", "Mua sắm", "Học tập", "Tiền nước", "Ăn uống", "Khác"];
+  const categories = [
+    "Tổng",
+    "Tiền điện",
+    "Thuê nhà",
+    "Internet",
+    "Di chuyển",
+    "Giải trí",
+    "Mua sắm",
+    "Học tập",
+    "Tiền nước",
+    "Ăn uống",
+    "Khác",
+  ];
 
   const onChangeFromDate = (event: any, selectedDate?: Date) => {
     setShowFromDatePicker(false);
@@ -46,7 +58,7 @@ const BudgetScreen = () => {
       setFromDate(selectedDate);
       // Đảm bảo fromDate không lớn hơn toDate
       if (selectedDate > toDate) setToDate(selectedDate);
-    } 
+    }
   };
 
   const onChangeToDate = (event: any, selectedDate?: Date) => {
@@ -57,8 +69,8 @@ const BudgetScreen = () => {
         Alert.alert("Lỗi", "Ngày kết thúc không thể nhỏ hơn ngày bắt đầu!");
         return;
       }
-      setToDate(selectedDate); 
-    } 
+      setToDate(selectedDate);
+    }
   };
 
   const handleSaveBudget = async () => {
@@ -75,7 +87,8 @@ const BudgetScreen = () => {
       return;
     }
     // Nếu không chọn category, mặc định là "Tổng"
-    const finalCategory = category === "Chọn loại ngân sách" ? "Tổng" : category;
+    const finalCategory =
+      category === "Chọn loại ngân sách" ? "Tổng" : category;
 
     const budgetData = {
       userId,
@@ -88,7 +101,10 @@ const BudgetScreen = () => {
 
     try {
       await addBudget(budgetData);
-      Alert.alert("Thành công", `Ngân sách cho "${finalCategory}" đã được lưu từ ${formatDate(fromDate)} đến ${formatDate(toDate)}!`);
+      Alert.alert(
+        "Thành công",
+        `Ngân sách cho "${finalCategory}" đã được lưu từ ${formatDate(fromDate)} đến ${formatDate(toDate)}!`
+      );
       navigation.goBack();
     } catch (error) {
       console.error("Lỗi khi lưu ngân sách:", error);
@@ -112,13 +128,27 @@ const BudgetScreen = () => {
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={navigation.goBack} style={styles.iconButton}>
-              <MaterialCommunityIcons name="arrow-left" size={24} color="#fff" />
+            <TouchableOpacity
+              onPress={navigation.goBack}
+              style={styles.iconButton}
+            >
+              <MaterialCommunityIcons
+                name="arrow-left"
+                size={24}
+                color="#fff"
+              />
             </TouchableOpacity>
-            <Text style={styles.headerText} numberOfLines={1} ellipsizeMode="tail">
+            <Text
+              style={styles.headerText}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
               Thêm Ngân Sách
             </Text>
-            <TouchableOpacity onPress={handleSaveBudget} style={styles.saveButton}>
+            <TouchableOpacity
+              onPress={handleSaveBudget}
+              style={styles.saveButton}
+            >
               <Text style={styles.saveText}>Lưu</Text>
             </TouchableOpacity>
           </View>
@@ -242,14 +272,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#34d399",
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 12,
     marginBottom: 20,
   },
   headerText: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: "700",
     color: "#fff",
     flex: 1,
@@ -269,7 +299,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   saveText: {
-    color: "#4CAF50",
+    color: "#34d399",
     fontSize: 14,
     fontWeight: "600",
   },
@@ -295,7 +325,7 @@ const styles = StyleSheet.create({
   currencyText: {
     fontSize: 20,
     fontWeight: "500",
-    color: "#4CAF50",
+    color: "#34d399",
   },
   toggleButton: {
     backgroundColor: "#2196F3",
@@ -375,7 +405,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#34d399",
   },
   loadingText: {
     color: "#fff",

@@ -62,6 +62,32 @@ export default StyleSheet.create({
         fontSize: 14,
         color: '#333',
     },
+    intervalPickerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        padding: 16,
+        backgroundColor: '#FFFFFF',
+        marginTop: 8,
+        zIndex: 1, // Đảm bảo zIndex thấp hơn popup
+    },
+    intervalButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        marginHorizontal: 8,
+        borderRadius: 8,
+        backgroundColor: '#F0F0F0',
+    },
+    intervalButtonActive: {
+        backgroundColor: '#E0E0E0',
+    },
+    intervalButtonText: {
+        fontSize: 16,
+        color: '#666',
+    },
+    intervalButtonTextActive: {
+        color: '#007AFF',
+        fontWeight: 'bold',
+    },
     chartContainer: {
         backgroundColor: '#38576C', // Màu nền tối để phù hợp với biểu đồ
         borderRadius: 10,

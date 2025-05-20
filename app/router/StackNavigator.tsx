@@ -20,6 +20,7 @@ import ProfileScreen from "../screens/Profile/ProfileScreen";
 import CategoryAnalysisChartScreen from "@/app/screens/Chart/CategoryAnalysisChart/CategoryAnalysisChartScreen";
 import TrendChartScreen from "@/app/screens/Chart/TrendChart/TrendChartScreen";
 import IncomeAndExpenditureComparisonChart from "@/app/screens/Chart/IncomeAndExpenditureComparisonChart/IncomeAndExpenditureComparisonChart";
+import SearchScreen from "../screens/Search/SreachScreen";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -37,6 +38,7 @@ export default function StackNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Search" component={SearchScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
       <Stack.Screen name="TransactionDetail" component={TransactionDetailScreen} options={{ headerShown: false }} />
       <Stack.Screen name="EditTransaction" component={EditTransactionScreen} options={{ headerShown: false }} />

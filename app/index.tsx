@@ -6,8 +6,8 @@ import { SafeAreaView, StatusBar } from 'react-native';
 export default function Index() {
   return (
     <GestureHandlerRootView>
-        <StatusBar barStyle="dark-content" />
-        <Router />
+      <StatusBar barStyle="dark-content" />
+      <Router />
     </GestureHandlerRootView>
   );
 }

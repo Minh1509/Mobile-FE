@@ -32,7 +32,7 @@ type EditTransactionScreenRouteProp = RouteProp<RootStackParamList, 'EditTransac
 const EditTransactionScreen = () => {
     const navigation = useNavigation<EditTransactionScreenNavigationProp>();
     const route = useRoute<EditTransactionScreenRouteProp>();
-    const transaction = route.params?.transaction;
+    const { transaction, origin } = route.params;
 
     const paymentMethods = ["cash", "card", "bank_transfer"];
     // Form state
@@ -145,39 +145,114 @@ const EditTransactionScreen = () => {
         const numericAmount = parseInt(String(money).replace(/[^\d]/g, ""));
         const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
         const formattedTime = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-
+      
         if (!numericAmount || !category || category === "Chọn loại") {
-            Alert.alert("Thiếu thông tin", "Vui lòng nhập số tiền và chọn danh mục");
-            return;
+          Alert.alert("Thiếu thông tin", "Vui lòng nhập số tiền và chọn danh mục");
+          return;
         }
-
+      
         const updatedTransaction: Partial<ITransaction> = {
-            amount: numericAmount,
-            date: formattedDate,
-            time: formattedTime,
-            category,
-            description,
-            location,
-            paymentMethod,
-            note,
-            image: imageUri || "",
-            updatedAt: serverTimestamp()
+          amount: numericAmount,
+          date: formattedDate,
+          time: formattedTime,
+          category,
+          description,
+          location,
+          paymentMethod,
+          note,
+          image: imageUri || "",
+          updatedAt: serverTimestamp(),
         };
-
+      
         try {
-            const result = await TransactionService.updateTransaction(transaction.id, updatedTransaction);
-            if (result.success) {
-                Alert.alert("Thành công", "Giao dịch đã được cập nhật.", [
-                    { text: "OK", onPress: () => navigation.navigate('TransactionDetail', { transaction: { ...transaction, ...updatedTransaction } }) }
-                ]);
-            } else {
-                Alert.alert("Lỗi", result.error || "Không thể cập nhật giao dịch. Vui lòng thử lại.");
-            }
+          const result = await TransactionService.updateTransaction(transaction.id, updatedTransaction);
+          if (result.success) {
+            const fullTransaction: ITransaction = {
+              ...transaction,
+              ...updatedTransaction,
+              id: transaction.id,
+              userId: transaction.userId,
+              type: transaction.type,
+            };
+            Alert.alert("Thành công", "Giao dịch đã được cập nhật.", [
+              {
+                text: "OK",
+                onPress: () => {
+                    if (origin === 'Search') {
+                        navigation.reset({
+                          index: 1,
+                          routes: [
+                            { name: 'Tabs', state: {routes: [{ name: 'Search'}]}},
+                            {
+                              name: 'TransactionDetail',
+                              params: { transaction: fullTransaction, origin: 'Search' },
+                            },
+                          ],
+                        });
+                      } else if (origin === 'Calendar') {
+                        navigation.reset({
+                          index: 2,
+                          routes: [
+                            {
+                                name: 'Tabs',
+                                state: {
+                                  routes: [
+                                    {
+                                      name: 'Calendar',
+                                      params: {
+                                        selectedDate: fullTransaction.date.split('/').reverse().join('-'),
+                                      },
+                                    },
+                                  ],
+                                },
+                              },
+                            {
+                              name: 'CategoryTransactions',
+                              params: {
+                                category: fullTransaction.category,
+                                month: date.getMonth() + 1,
+                                year: date.getFullYear(),
+                                selectedDate: fullTransaction.date.split('/').reverse().join('-'),
+                                origin: 'Calendar',
+                              },
+                            },
+                            {
+                              name: 'TransactionDetail',
+                              params: { transaction: fullTransaction, origin: 'Calendar' },
+                            },
+                          ],
+                        });
+                      } else {
+                        navigation.reset({
+                          index: 2,
+                          routes: [
+                            { name: 'Tabs' },
+                            {
+                              name: 'CategoryTransactions',
+                              params: {
+                                category: fullTransaction.category,
+                                month: date.getMonth() + 1,
+                                year: date.getFullYear(),
+                              },
+                            },
+                            {
+                              name: 'TransactionDetail',
+                              params: { transaction: fullTransaction, origin: 'Home' },
+                            },
+                          ],
+                        });
+                      }
+                },
+              },
+            ]);
+          } else {
+            Alert.alert("Lỗi", result.error || "Không thể cập nhật giao dịch. Vui lòng thử lại.");
+          }
         } catch (error: any) {
-            console.error("Lỗi khi cập nhật giao dịch:", error);
-            Alert.alert("Lỗi", "Không thể cập nhật giao dịch. Vui lòng thử lại.");
+          console.error("Lỗi khi cập nhật giao dịch:", error);
+          Alert.alert("Lỗi", "Không thể cập nhật giao dịch. Vui lòng thử lại.");
         }
-    };
+      };
 
     return (
         <SafeAreaView style={styles.container}>
